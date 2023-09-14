@@ -31,14 +31,16 @@ func RunBashCommand(command string) (string, error) {
 }
 
 func CheckEnvVar(env string) bool {
-	if env != "" {
+	value := os.Getenv(env)
+	if value != "" {
 		return true
 	}
 	return false
 }
 
 func CheckIfEnvVarIsTrue(env string) bool {
-	if env == "true" {
+	value := os.Getenv(env)
+	if value == "true" {
 		return true
 	}
 	return false
