@@ -30,12 +30,12 @@ func RunBashCommand(command string) (string, error) {
 	return outputStr, nil
 }
 
-func CheckEnvVar(env string) bool {
-	value := os.Getenv(env)
-	if value != "" {
-		return true
+func CheckEnvVar(env string) (string, bool) {
+	value, result := os.LookupEnv(env)
+	if value == "" {
+		return "", result
 	}
-	return false
+	return value, result
 }
 
 func CheckIfEnvVarIsTrue(env string) bool {
@@ -158,10 +158,11 @@ func VerifyOrCreateDirectory(directory string) bool {
 		}
 	} else if err != nil {
 		LogError.Print(err)
+		return false
 	} else {
 		LogInfo.Println("directory already exists")
 		return true
 	}
 
-	return false
+	return true
 }

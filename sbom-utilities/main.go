@@ -20,25 +20,31 @@ func main() {
 	LogInfo.Print("Starting ccideas post sbom creation actions")
 
 	// check for sbom file or a directory where sboms can be found (user controlled)
-	if !utils.CheckEnvVar(os.Getenv("PATH_TO_SBOM")) {
-		if !utils.CheckFileExists(os.Getenv("PATH_TO_SBOM")) {
-			LogError.Fatal("verify env var PATH_TO_SBOM is set and exists")
+	var sbomFile string
+
+	if sbomFilePath, isSet := utils.CheckEnvVar("PATH_TO_SBOM"); isSet {
+		if utils.CheckFileExists("PATH_TO_SBOM") {
+			LogInfo.Print("found sBom: " + sbomFilePath)
+			sbomFile = sbomFilePath
+		} else {
+			LogError.Fatal("verify env var PATH_TO_SBOM is set and the file/directory exists")
 		}
 	}
 
-	var sbomFile string = os.Getenv("PATH_TO_SBOM")
-
 	// setup output directory path
 	var outputDir string
-
-	if utils.CheckEnvVar(os.Getenv("OUTPUT_DIRECTORY")) {
-		outputDir = os.Getenv("OUTPUT_DIRECTORY")
+	
+	if outputDirPath, isSet := utils.CheckEnvVar("OUTPUT_DIRECTORY"); isSet {
+		outputDir = outputDirPath
 	} else {
 		utils.VerifyOrCreateDirectory(DEFAULT_OUTPUT_DIRECTORY)
 		outputDir = DEFAULT_OUTPUT_DIRECTORY
 	}
+	
+	// run utilities
 
-	if utils.CheckIfEnvVarIsTrue(os.Getenv("SCAN_SBOM_WITH_BOMBER")) {
+	// bomber
+	if utils.CheckIfEnvVarIsTrue("SCAN_SBOM_WITH_BOMBER") {
 		scanWithBomber(sbomFile, outputDir)
 	}
 }

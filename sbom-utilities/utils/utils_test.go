@@ -1,7 +1,6 @@
 package utils
 
 import (
-	//"fmt"
 	"os"
 	"testing"
 
@@ -39,7 +38,7 @@ func TestCheckEnvVarThatExists(t *testing.T) {
 	os.Setenv("TEST_ENV_VAR", "1")
 	
 	//when
-	result := CheckEnvVar("TEST_ENV_VAR")
+	_, result := CheckEnvVar("TEST_ENV_VAR")
 
 	//then
 	assert.True(t, result)
@@ -47,7 +46,7 @@ func TestCheckEnvVarThatExists(t *testing.T) {
 
 func TestCheckEnvVarThatDoesNotExists(t *testing.T) {
 	//when
-	result := CheckEnvVar("THIS_ENV_VAR_DOES_NOT_EXIST")
+	_, result := CheckEnvVar("THIS_ENV_VAR_DOES_NOT_EXIST")
 
 	//then
 	assert.False(t, result)
@@ -71,13 +70,50 @@ func TestEnvVarIsNotTrue(t *testing.T) {
 
 func TestCheckIfFileExists(t *testing.T) {
 	//given
-	tempDirName, err := os.MkdirTemp(".", "temp")
-	defer os.Remove(tempDirName)
-	assert.NoError(t, err, "an error occured when trying to create a temp dir")
+	tempDirName := t.TempDir()
 
-	assert.True(t, CheckFileExists(tempDirName))
+	assert.True(t, CheckFileExists(tempDirName), "directory does not exist")
 }
 
 func TestCheckIfFileDoesNotExists(t *testing.T) {
 	assert.False(t, CheckFileExists("thisDirDoesNotExist"))
+}
+
+func TestRunLiveBashCommand(t *testing.T) {
+	//given
+	command := "echo 'Hello, World!'"
+
+	//when
+	output, err := RunLiveBashCommand(command)
+
+	//then
+	assert.NoError(t, err, "expected no error but got one")
+	expectedOutput := ""
+	assert.Equal(t, expectedOutput, output)
+}
+
+func TestRunLiveBashCommandFailure(t *testing.T) {
+	//given
+	command := "'Hello, World!'"
+
+	//when
+	output, err := RunLiveBashCommand(command)
+
+	//then
+	assert.Error(t, err, "expexted an error but did not get one")
+	expectedOutput := ""
+	assert.Equal(t, expectedOutput, output)
+}
+
+func TestVerifyOrCreateDirectory(t *testing.T) {
+	// Create a temporary directory specific to this test
+	testDir := t.TempDir()
+
+	// Test case 1: VerifyOrCreateDirectory for a non-existent directory
+	result := VerifyOrCreateDirectory(testDir)
+	assert.True(t, result, "expected directory to be created, but it wasn't")
+	
+	// Test case 2: VerifyOrCreateDirectory for an existing directory
+	result = VerifyOrCreateDirectory(testDir)
+	assert.True(t, result, "expected directory to exist, but it didn't")
 }

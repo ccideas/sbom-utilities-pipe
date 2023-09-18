@@ -3,7 +3,6 @@ package bomber
 import (
 	"sbom-utilities/utils"
 	"log"
-	"os"
 	"os/exec"
 	"strings"
 )
@@ -23,28 +22,28 @@ func CheckBomberVersion() (bool, string) {
 func GenBomberArgs() string {
 	var bomberArgs string
 
-	if utils.CheckEnvVar(os.Getenv("BOMBER_DEBUG")) {
+	if _, isSet := utils.CheckEnvVar("BOMBER_DEBUG"); isSet {
 		bomberArgs += "--debug" + " "
 	}
 
-	if utils.CheckEnvVar(os.Getenv("BOMBER_IGNORE_FILE")) {
-		bomberArgs += "--ignore-file " + os.Getenv("BOMBER_IGNORE_FILE") + " "
+	if bomberIgnoreFile, isSet := utils.CheckEnvVar("BOMBER_IGNORE_FILE"); isSet {
+		bomberArgs += "--ignore-file " + bomberIgnoreFile + " "
 	}
 
-	if utils.CheckEnvVar(os.Getenv("BOMBER_PROVIDER")) {
-		bomberArgs += "--provider " + os.Getenv("BOMBER_PROVIDER") + " "
+	if bomberProvider, isSet := utils.CheckEnvVar("BOMBER_PROVIDER"); isSet {
+		bomberArgs += "--provider " + bomberProvider + " "
 	}
 
-	if utils.CheckEnvVar(os.Getenv("BOMBER_PROVIDER_USERNAME")) {
-		bomberArgs += "--username " + os.Getenv("BOMBER_PROVIDER_USERNAME") + " "
+	if bomberProviderUsername, isSet := utils.CheckEnvVar("BOMBER_PROVIDER_USERNAME"); isSet {
+		bomberArgs += "--username " + bomberProviderUsername + " "
 	}
 
-	if utils.CheckEnvVar(os.Getenv("BOMBER_PROVIDER_TOKEN")) {
-		bomberArgs += "--token " + os.Getenv("BOMBER_PROVIDER_TOKEN") + " "
+	if bomberProviderToken, isSet := utils.CheckEnvVar("BOMBER_PROVIDER_TOKEN"); isSet {
+		bomberArgs += "--token " + bomberProviderToken + " "
 	}
 
-	if utils.CheckEnvVar(os.Getenv("BOMBER_OUTPUT_FORMAT")) {
-		bomberArgs += "--output " + os.Getenv("BOMBER_OUTPUT_FORMAT") + " "
+	if bomberOutputFormat, isSet := utils.CheckEnvVar("BOMBER_OUTPUT_FORMAT"); isSet {
+		bomberArgs += "--output " + bomberOutputFormat + " "
 	}
 
 	return bomberArgs
