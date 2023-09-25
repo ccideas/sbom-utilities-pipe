@@ -1,9 +1,9 @@
 package bomber
 
 import (
-	"sbom-utilities/utils"
 	"log"
 	"os/exec"
+	"sbom-utilities/utils"
 	"strings"
 )
 
@@ -52,6 +52,7 @@ func GenBomberArgs() string {
 func ScanWithBomber(sbom string, switches string, logger *log.Logger) (result bool) {
 	cmd := "bomber scan " + switches + " " + sbom
 	logger.Print("running the following command: " + cmd)
-	utils.RunLiveBashCommand(cmd)
-	return true
+	err := utils.RunLiveBashCommand(cmd)
+
+	return err == nil
 }

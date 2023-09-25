@@ -1,2 +1,10 @@
 output/
+
+# test output
 profile.out
+coverage.out
+tmp.out
+**/temp*
+
+# build output
+sbom-utilities

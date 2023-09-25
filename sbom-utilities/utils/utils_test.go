@@ -36,7 +36,7 @@ func TestRunBashCommandFailureCase(t *testing.T) {
 func TestCheckEnvVarThatExists(t *testing.T) {
 	//given
 	os.Setenv("TEST_ENV_VAR", "1")
-	
+
 	//when
 	_, result := CheckEnvVar("TEST_ENV_VAR")
 
@@ -84,12 +84,10 @@ func TestRunLiveBashCommand(t *testing.T) {
 	command := "echo 'Hello, World!'"
 
 	//when
-	output, err := RunLiveBashCommand(command)
+	err := RunLiveBashCommand(command)
 
 	//then
 	assert.NoError(t, err, "expected no error but got one")
-	expectedOutput := ""
-	assert.Equal(t, expectedOutput, output)
 }
 
 func TestRunLiveBashCommandFailure(t *testing.T) {
@@ -97,12 +95,10 @@ func TestRunLiveBashCommandFailure(t *testing.T) {
 	command := "'Hello, World!'"
 
 	//when
-	output, err := RunLiveBashCommand(command)
+	err := RunLiveBashCommand(command)
 
 	//then
 	assert.Error(t, err, "expexted an error but did not get one")
-	expectedOutput := ""
-	assert.Equal(t, expectedOutput, output)
 }
 
 func TestVerifyOrCreateDirectory(t *testing.T) {
@@ -112,7 +108,7 @@ func TestVerifyOrCreateDirectory(t *testing.T) {
 	// Test case 1: VerifyOrCreateDirectory for a non-existent directory
 	result := VerifyOrCreateDirectory(testDir)
 	assert.True(t, result, "expected directory to be created, but it wasn't")
-	
+
 	// Test case 2: VerifyOrCreateDirectory for an existing directory
 	result = VerifyOrCreateDirectory(testDir)
 	assert.True(t, result, "expected directory to exist, but it didn't")

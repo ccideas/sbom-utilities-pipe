@@ -40,10 +40,8 @@ func CheckEnvVar(env string) (string, bool) {
 
 func CheckIfEnvVarIsTrue(env string) bool {
 	value := os.Getenv(env)
-	if value == "true" {
-		return true
-	}
-	return false
+
+	return value == "true"
 }
 
 func CheckFileExists(filename string) bool {
@@ -62,25 +60,25 @@ func CheckFileExists(filename string) bool {
 	return false
 }
 
-func RunLiveBashCommand(command string) (string, error) {
+func RunLiveBashCommand(command string) error {
 
 	cmd := exec.Command("bash", "-c", command)
 
 	// Create a pipe to capture the command's stdout
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	// Create a pipe to capture the command's stderr
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	// Start the command
 	if err := cmd.Start(); err != nil {
-		return "", err
+		return err
 	}
 
 	// Read and print the live output from stdout
@@ -104,10 +102,10 @@ func RunLiveBashCommand(command string) (string, error) {
 	// Wait for the command to complete
 	if err := cmd.Wait(); err != nil {
 		LogError.Print(err)
-		return "", err
+		return err
 	}
 
-	return "", nil
+	return nil
 }
 
 func MoveFile(directoryPath string, dest string, contains string) bool {

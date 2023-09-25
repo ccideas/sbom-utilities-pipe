@@ -33,14 +33,14 @@ func main() {
 
 	// setup output directory path
 	var outputDir string
-	
+
 	if outputDirPath, isSet := utils.CheckEnvVar("OUTPUT_DIRECTORY"); isSet {
 		outputDir = outputDirPath
 	} else {
 		utils.VerifyOrCreateDirectory(DEFAULT_OUTPUT_DIRECTORY)
 		outputDir = DEFAULT_OUTPUT_DIRECTORY
 	}
-	
+
 	// run utilities
 
 	// bomber
