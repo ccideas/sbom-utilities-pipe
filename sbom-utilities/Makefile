@@ -32,7 +32,7 @@ lint:
 .PHONY: clean
 clean:
 	$(shell rm profile.out)
-	$(shell rm sbom-utilities)
+	$(shell rm -rf bin)
 	$(shell rm tmp.out)
 	$(shell rm -rf utils/*temp*)
 	$(shell rm -rf output)
@@ -40,7 +40,7 @@ clean:
 
 .PHONY: build
 build:
-	$(GO) build
+	$(GO) build -o sbom-utils
 
 .PHONY: docker
 docker:
