@@ -23,7 +23,7 @@ func main() {
 	var sbomFile string
 
 	if sbomFilePath, isSet := utils.CheckEnvVar("PATH_TO_SBOM"); isSet {
-		if utils.CheckFileExists("PATH_TO_SBOM") {
+		if utils.CheckFileExists(sbomFilePath) {
 			LogInfo.Print("found sBom: " + sbomFilePath)
 			sbomFile = sbomFilePath
 		} else {
