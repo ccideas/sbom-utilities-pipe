@@ -40,7 +40,7 @@ clean:
 
 .PHONY: build
 build:
-	$(GO) build -o sbom-utils
+	$(GO) build -o bin/sbom-utils
 
 .PHONY: docker
 docker:

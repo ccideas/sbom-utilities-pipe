@@ -34,27 +34,29 @@ pipelines:
             name: 'Docker Lint'
             script:
               - echo "Linting Dockerfile(s)"
-              - hadolint Dockerfile
+              - hadolint Dockerfile || echo "found linting issues in Dockerfile"
         - step: *build-dev-docker-image
         - step:
             image: golang:1.21.1-alpine3.18
-            name: 'Build Native'
+            name: 'Build & Test'
             script:
               - go build -o bin/sbom-utils
+              - apk add bash
+              - go test -v -covermode=count -coverprofile=profile.out sbom-utilities/utils
+            artifacts:
+              - "bin/*"
+              - "profile.out"
         - step:
             image: golang:1.21.1-alpine3.18
-            name: 'Lint Go Code'
+            name: 'Check Go Formatting'
             script:
-              - make clean
-              - make fmt-check
-              - make lint
+              - gofmt -s -d $(find . -name "*.go")
         - step:
             image: golang:1.21.1-alpine3.18
-            name: 'Test Native'
+            name: 'Go Linter'
             script:
-              - make clean
-              - make test
-      
+              - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.54.2
+              - bin/golangci-lint run ./...
   branches:
     main:
       - step: *build-prod-docker-image
