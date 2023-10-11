@@ -1,25 +1,10 @@
 definitions:
   steps:
-    - step: &build-dev-docker-image
-        name: 'Build Development Docker Image'
+    - step: &build-docker-image
+        name: 'Build Docker Image'
         script:
-          - IMAGE_NAME=${BITBUCKET_REPO_SLUG}
-          - echo "IMAGE_NAME is set to:\ ${IMAGE_NAME}"
-          - docker build --tag "${IMAGE_NAME}:dev" .
-          - docker save "${IMAGE_NAME}:dev" --output "${IMAGE_NAME}.tar"
-        services:
-          - docker
-        caches:
-          - docker
-        artifacts:
-          - "*.tar"
-    - step: &build-prod-docker-image
-        name: 'Building Production Docker Image'
-        script:
-          - IMAGE_NAME=${BITBUCKET_REPO_SLUG}
-          - echo "IMAGE_NAME is set to:\ ${IMAGE_NAME}"
-          - docker build --tag "${IMAGE_NAME}:${PROD_VERSION}" .
-          - docker save "${IMAGE_NAME}:${PROD_VERSION}" --output "${IMAGE_NAME}.tar"
+          - docker build --tag "${BITBUCKET_REPO_SLUG}:local" .
+          - docker save "${BITBUCKET_REPO_SLUG}:local" --output "${BITBUCKET_REPO_SLUG}.tar"
         services:
           - docker
         caches:
@@ -35,7 +20,7 @@ pipelines:
             script:
               - echo "Linting Dockerfile(s)"
               - hadolint Dockerfile || echo "found linting issues in Dockerfile"
-        - step: *build-dev-docker-image
+        - step: *build-docker-image
         - step:
             image: golang:1.21.1-alpine3.18
             name: 'Build & Test'
@@ -59,16 +44,15 @@ pipelines:
               - bin/golangci-lint run ./...
   branches:
     main:
-      - step: *build-prod-docker-image
+      - step: *build-docker-image
       - step:
-          name: 'Publish Docker Image'
-          deployment: Production
+          name: 'Publish Dev Docker Image'
+          deployment: Development
           trigger: manual
           script:
             - echo ${DOCKERHUB_PASSWORD} | docker login --username "${DOCKERHUB_USERNAME}" --password-stdin
-            - IMAGE_NAME=$BITBUCKET_REPO_SLUG
-            - docker load --input "${IMAGE_NAME}.tar"
-            - IMAGE=${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}
-            - docker push "${IMAGE}:${VERSION}"
+            - docker load --input "${BITBUCKET_REPO_SLUG}.tar"
+            - docker tag "${BITBUCKET_REPO_SLUG}:local" "${DOCKERHUB_NAMESPACE}/${BITBUCKET_REPO_SLUG}:${DEV_VERSION}-${BITBUCKET_BUILD_NUMBER}"
+            - docker push "${DOCKERHUB_NAMESPACE}/${BITBUCKET_REPO_SLUG}:${DEV_VERSION}-${BITBUCKET_BUILD_NUMBER}"
           services:
             - docker
