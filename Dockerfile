@@ -2,28 +2,24 @@
 
 FROM golang:1.21.1-alpine3.18 AS builder
 
-# TODO: You probaly do not need bash in the builder
-RUN apk update && apk upgrade \
-    && apk add bash \
-    && rm -rf /var/cache/apk/*
-
 # copy source and build
 COPY . /build
 WORKDIR /build
 
-RUN mkdir -p /opt/sbom-utilities-pipe/bin \
-    && go build -o /opt/sbom-utilities-pipe/bin/sbom-utils
+RUN go build -o bin/sbom-utils
 
 # runtime stage
 
-FROM alpine:3.18.4
+FROM golang:1.21.1-alpine3.18
 
 # hadolint ignore=DL3018
 RUN apk update && apk upgrade \
     && apk add bash \
     && rm -rf /var/cache/apk/*
 
-COPY --from=builder /opt/sbom-utilities-pipe/bin/sbom-utils /opt/sbom-utilities-pipe/bin/sbom-utils
+ENV SBOM_UTILITIES_MODULE_HOME="/opt/sbom-utilities"
+
+COPY --from=builder /build/bin/sbom-utils ${SBOM_UTILITIES_MODULE_HOME}/bin/sbom-utils 
 
 SHELL ["/bin/bash", "-c"]
 
@@ -33,5 +29,8 @@ RUN addgroup --system --gid 1002 bitbucket-group && \
 
 USER bitbucket-user
 
-WORKDIR /opt/sbom-utilities-pipe
-ENTRYPOINT ["bin/sbom-utils"]
+WORKDIR ${SBOM_UTILITIES_MODULE_HOME}
+
+ENV PATH="${SBOM_UTILITIES_MODULE_HOME}/bin:${PATH}"
+
+ENTRYPOINT ["sbom-utils"]

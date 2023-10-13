@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"sbom-utilities/bomber"
 	"sbom-utilities/utils"
+	"sbom-utilities/version"
 )
 
 // configure logger
@@ -16,6 +18,10 @@ var (
 var DEFAULT_OUTPUT_DIRECTORY string = "../output"
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "version" {
+		fmt.Printf("Version: %s\n", version.GetModuleVersion())
+		return
+	}
 
 	LogInfo.Print("Starting ccideas post sbom creation actions")
 

@@ -8,4 +8,5 @@ tmp.out
 
 # build output
 sbom-utils
+sbom-utilities
 bin/

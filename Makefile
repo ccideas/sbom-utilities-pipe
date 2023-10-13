@@ -37,6 +37,7 @@ clean:
 	$(shell rm -rf utils/*temp*)
 	$(shell rm -rf output)
 	$(shell rm coverage.out)
+	$(shell rm sbom-utilities)
 
 .PHONY: build
 build:
@@ -46,9 +47,17 @@ build:
 docker:
 	$(DOCKER) build --tag sbom-utilities-pipe:dev .
 
+.PHONY: docker-amd64
+docker-amd64:
+	$(DOCKER) buildx build --platform linux/amd64 --tag sbom-utilities-pipe:dev .
+
+.PHONY: docker-run
+docker-run:
+	$(DOCKER) run --rm -it sbom-utilities-pipe:dev
+
 .PHONY: docker-lint
 docker-lint:
 	$(DOCKER) run --rm -it \
 		-v "$(shell pwd)":/build \
 		--workdir /build \
-		hadolint/hadolint:v2.12.0-alpine hadolint Dockerfile
+		hadolint/hadolint:v2.12.0-alpine hadolint Dockerfile*
