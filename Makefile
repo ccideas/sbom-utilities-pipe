@@ -45,7 +45,7 @@ build:
 
 .PHONY: docker
 docker:
-	$(DOCKER) build --tag sbom-utilities-pipe:dev .
+	$(DOCKER) build --build-arg ARCH=arm64 --tag sbom-utilities-pipe:dev .
 
 .PHONY: docker-amd64
 docker-amd64:

@@ -61,6 +61,7 @@ func scanWithBomber(sbomFile string, outputDir string) bool {
 
 	if !result {
 		LogError.Print("bomber is not installed")
+		return false
 	}
 
 	LogInfo.Print(output)

@@ -3,7 +3,7 @@ definitions:
     - step: &build-docker-image
         name: 'Build Docker Image'
         script:
-          - docker build --tag "${BITBUCKET_REPO_SLUG}:local" .
+          - docker build --build-arg ARCH=amd64 --tag "${BITBUCKET_REPO_SLUG}:local" .
           - docker save "${BITBUCKET_REPO_SLUG}:local" --output "${BITBUCKET_REPO_SLUG}.tar"
         services:
           - docker
