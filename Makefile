@@ -61,3 +61,10 @@ docker-lint:
 		-v "$(shell pwd)":/build \
 		--workdir /build \
 		hadolint/hadolint:v2.12.0-alpine hadolint Dockerfile*
+
+.PHONY: markdown-lint
+markdown-lint:
+	$(DOCKER) run --rm -it \
+		-v "$(shell pwd)":/build \
+		--workdir /build \
+		markdownlint/markdownlint:0.13.0 *.md
