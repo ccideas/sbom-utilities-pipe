@@ -83,3 +83,4 @@ pipelines:
             - git checkout ${BITBUCKET_BRANCH}
             - git pull
             - git push github ${BITBUCKET_BRANCH}
+            - rm id_ed25519_github_sbom-utilities-pipe_deploy
