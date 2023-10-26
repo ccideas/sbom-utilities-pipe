@@ -11,6 +11,19 @@ definitions:
           - docker
         artifacts:
           - "*.tar"
+    - step: &push-to-github
+      name: 'push to Github'
+      image: alpine/git:1.0.26
+      services:
+          - docker
+      caches:
+          - docker
+      script:
+        - git remote add github "git@github.com:ccideas/sbom-utilities-pipe.git"
+        - git checkout ${BITBUCKET_BRANCH}
+        - git pull
+        - git push github ${BITBUCKET_BRANCH}
+
 pipelines:
   default:
     - parallel:
@@ -56,3 +69,23 @@ pipelines:
             - docker push "${DOCKERHUB_NAMESPACE}/${BITBUCKET_REPO_SLUG}:${DEV_VERSION}-${BITBUCKET_BUILD_NUMBER}"
           services:
             - docker
+  custom:
+    push to Github:
+      - step:
+          name: push branch to github
+          image: alpine/git:1.0.26
+          services:
+            - docker
+          caches:
+            - docker
+          script:
+            - echo -n ${GITHUB_DEPLOY_KEY} | base64 -d > id_ed25519_github_sbom-utilities-pipe_deploy
+            - chmod 600 id_ed25519_github_sbom-utilities-pipe_deploy
+            - ls -la
+            - export GIT_SSH_COMMAND="ssh -v -i id_ed25519_github_sbom-utilities-pipe_deploy"
+            - git remote add github "git@github.com:ccideas/sbom-utilities-pipe.git"
+            - git checkout ${BITBUCKET_BRANCH}
+            - git pull
+            - git push github ${BITBUCKET_BRANCH}
+          artifacts:
+            - "id_ed25519_github_sbom-utilities-pipe_deploy"
