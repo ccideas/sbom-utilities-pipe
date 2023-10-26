@@ -1,10 +1,10 @@
 # Bitbucket Pipelines Pipe: sBOM Utilities
 
 A Bitbucket Pipe containing a collection of open source tools to perform
-various types of additionl analysis on a CycloneDx or SPDX sBOM (Software Bill of Materials).
+various types of additionl analysis on a CycloneDX or SPDX sBOM (Software Bill of Materials).
 
 The official copy this project is hosted on [Bitbucket](https://bitbucket.org/ccideas1/cyclonedx-npm-pipe/src/main/).
-In order to reach a diverse audience a copy of the repo also exists in [GitHub](https://github.com/ccideas/cyclonedx-npm-pipe).
+In order to reach a diverse audience a copy of the repo also exists in [GitHub](https://github.com/ccideas/sbom-utilities-pipe).
 Pull Requests should be submitted to the to the Bitbucket reposiotry and changes will be kept in sync.
 
 ## Existing toolset and roadmap
@@ -20,7 +20,7 @@ The following tooling/functionally is currently available in this pipe
 ### Future Tools & Featurs
 
 The following are the next set of tools/features which will be incorported into this pipe. To requrst other tooling/features or to
-vote to have a specific tool/feature integreted next, [open an issue](https://github.com/ccideas/cyclonedx-npm-pipe/issues)
+vote to have a specific tool/feature integreted next, [open an issue](https://github.com/ccideas/sbom-utilities-pipe/issues)
 
 | Tool/Feature | Description |
 | ------------ | ----------- |
@@ -117,7 +117,7 @@ product then the sBOM will be further processed by the sbom-utilities-pipe
 
 ## Support
 
-If you'd like help with this pipe, or you have an issue, or a feature request, [let us know](https://github.com/ccideas/cyclonedx-npm-pipe/issues).
+If you'd like help with this pipe, or you have an issue, or a feature request, [let us know](https://github.com/ccideas/sbom-utilities-pipe/issues).
 
 If you are reporting an issue, please include:
 

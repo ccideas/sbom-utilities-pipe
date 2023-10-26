@@ -11,53 +11,50 @@ definitions:
           - docker
         artifacts:
           - "*.tar"
-    - step: &push-to-github
-      name: 'push to Github'
-      image: alpine/git:1.0.26
-      services:
-          - docker
-      caches:
-          - docker
-      script:
-        - git remote add github "git@github.com:ccideas/sbom-utilities-pipe.git"
-        - git checkout ${BITBUCKET_BRANCH}
-        - git pull
-        - git push github ${BITBUCKET_BRANCH}
+    - step: &docker-lint
+        image: hadolint/hadolint:v2.12.0-alpine
+        name: 'Docker Lint'
+        script:
+          - echo "Linting Dockerfile(s)"
+          - hadolint Dockerfile || echo "found linting issues in Dockerfile"
+    - step: &build-test
+        image: golang:1.21.1-alpine3.18
+        name: 'Build & Test'
+        script:
+          - go build -o bin/sbom-utils
+          - apk add bash
+          - go test -v -covermode=count -coverprofile=profile.out sbom-utilities/utils
+        artifacts:
+          - "bin/*"
+          - "profile.out"
+    - step: &go-formatter
+        image: golang:1.21.1-alpine3.18
+        name: 'Check Go Formatting'
+        script:
+          - gofmt -s -d $(find . -name "*.go")
+    - step: &go-lint-yourself
+        image: golang:1.21.1-alpine3.18
+        name: 'Go Linter'
+        script:
+          - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.54.2
+          - bin/golangci-lint run ./...
 
 pipelines:
   default:
     - parallel:
-        - step:
-            image: hadolint/hadolint:v2.12.0-alpine
-            name: 'Docker Lint'
-            script:
-              - echo "Linting Dockerfile(s)"
-              - hadolint Dockerfile || echo "found linting issues in Dockerfile"
+        - step: *docker-lint
         - step: *build-docker-image
-        - step:
-            image: golang:1.21.1-alpine3.18
-            name: 'Build & Test'
-            script:
-              - go build -o bin/sbom-utils
-              - apk add bash
-              - go test -v -covermode=count -coverprofile=profile.out sbom-utilities/utils
-            artifacts:
-              - "bin/*"
-              - "profile.out"
-        - step:
-            image: golang:1.21.1-alpine3.18
-            name: 'Check Go Formatting'
-            script:
-              - gofmt -s -d $(find . -name "*.go")
-        - step:
-            image: golang:1.21.1-alpine3.18
-            name: 'Go Linter'
-            script:
-              - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.54.2
-              - bin/golangci-lint run ./...
+        - step: *build-test
+        - step: *go-formatter
+        - step: *go-lint-yourself
   branches:
     main:
-      - step: *build-docker-image
+      - parallel:
+        - step: *docker-lint
+        - step: *build-docker-image
+        - step: *build-test
+        - step: *go-formatter
+        - step: *go-lint-yourself
       - step:
           name: 'Publish Dev Docker Image'
           deployment: Development
@@ -81,11 +78,8 @@ pipelines:
           script:
             - echo -n ${GITHUB_DEPLOY_KEY} | base64 -d > id_ed25519_github_sbom-utilities-pipe_deploy
             - chmod 600 id_ed25519_github_sbom-utilities-pipe_deploy
-            - ls -la
-            - export GIT_SSH_COMMAND="ssh -v -i id_ed25519_github_sbom-utilities-pipe_deploy"
+            - export GIT_SSH_COMMAND="ssh -i id_ed25519_github_sbom-utilities-pipe_deploy"
             - git remote add github "git@github.com:ccideas/sbom-utilities-pipe.git"
             - git checkout ${BITBUCKET_BRANCH}
             - git pull
             - git push github ${BITBUCKET_BRANCH}
-          artifacts:
-            - "id_ed25519_github_sbom-utilities-pipe_deploy"
