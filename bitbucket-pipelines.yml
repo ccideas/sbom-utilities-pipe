@@ -47,25 +47,6 @@ pipelines:
         - step: *build-test
         - step: *go-formatter
         - step: *go-lint-yourself
-  branches:
-    main:
-      - parallel:
-        - step: *docker-lint
-        - step: *build-docker-image
-        - step: *build-test
-        - step: *go-formatter
-        - step: *go-lint-yourself
-      - step:
-          name: 'Publish Dev Docker Image'
-          deployment: Development
-          trigger: manual
-          script:
-            - echo ${DOCKERHUB_PASSWORD} | docker login --username "${DOCKERHUB_USERNAME}" --password-stdin
-            - docker load --input "${BITBUCKET_REPO_SLUG}.tar"
-            - docker tag "${BITBUCKET_REPO_SLUG}:local" "${DOCKERHUB_NAMESPACE}/${BITBUCKET_REPO_SLUG}:${DEV_VERSION}-${BITBUCKET_BUILD_NUMBER}"
-            - docker push "${DOCKERHUB_NAMESPACE}/${BITBUCKET_REPO_SLUG}:${DEV_VERSION}-${BITBUCKET_BUILD_NUMBER}"
-          services:
-            - docker
   custom:
     push to Github:
       - step:
@@ -84,3 +65,32 @@ pipelines:
             - git pull
             - git push github ${BITBUCKET_BRANCH}
             - rm id_ed25519_github_sbom-utilities-pipe_deploy
+    push to Dockerhub (dev):
+      - step: *build-docker-image
+      - step:
+          name: 'Publish Dev Docker Image'
+          deployment: Development
+          trigger: manual
+          script:
+            - echo ${DOCKERHUB_PASSWORD} | docker login --username "${DOCKERHUB_USERNAME}" --password-stdin
+            - docker load --input "${BITBUCKET_REPO_SLUG}.tar"
+            - docker tag "${BITBUCKET_REPO_SLUG}:local" "${DOCKERHUB_NAMESPACE}/${BITBUCKET_REPO_SLUG}:${DEV_VERSION}-${BITBUCKET_BUILD_NUMBER}"
+            - docker push "${DOCKERHUB_NAMESPACE}/${BITBUCKET_REPO_SLUG}:${DEV_VERSION}-${BITBUCKET_BUILD_NUMBER}"
+          services:
+            - docker
+    push to Dockerhub (prod):
+      - variables:
+          - name: PRODUCTION_VERSION
+      - step: *build-docker-image
+      - step:
+          name: 'Publish Dev Docker Image'
+          deployment: Production
+          trigger: manual
+          script:
+            - echo ${DOCKERHUB_PASSWORD} | docker login --username "${DOCKERHUB_USERNAME}" --password-stdin
+            - docker load --input "${BITBUCKET_REPO_SLUG}.tar"
+            - docker tag "${BITBUCKET_REPO_SLUG}:local" "${DOCKERHUB_NAMESPACE}/${BITBUCKET_REPO_SLUG}:${PRODUCTION_VERSION}"
+            - docker push "${DOCKERHUB_NAMESPACE}/${BITBUCKET_REPO_SLUG}:${PRODUCTION_VERSION}"
+          services:
+            - docker
+      
