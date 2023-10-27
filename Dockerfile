@@ -20,7 +20,7 @@ RUN apk update && apk upgrade \
     && rm -rf /var/cache/apk/*
 
 ENV SBOM_UTILITIES_MODULE_HOME="/opt/sbom-utilities" \
-    BOMBER_VERSION="0.4.4"
+    BOMBER_VERSION="0.4.5"
 
 ARG BOMBER_URL="https://github.com/devops-kung-fu/bomber/releases/download/v${BOMBER_VERSION}/bomber_${BOMBER_VERSION}_linux_${ARCH}.tar.gz"
 ARG BOMBER_FILENAME="bomber_${BOMBER_VERSION}_linux_${ARCH}.tar.gz"
