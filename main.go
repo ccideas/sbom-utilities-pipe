@@ -69,8 +69,12 @@ func scanWithBomber(sbomFile string, outputDir string) bool {
 	bomberArgs := bomber.GenBomberArgs()
 	LogInfo.Print("the following bomber args will be used: " + bomberArgs)
 	bomber.ScanWithBomber(sbomFile, bomberArgs, LogInfo)
+	currentDir, err := utils.RunBashCommand("pwd")
+	if err != nil {
+		LogError.Print("cant get current directory")
+	}
 
-	utils.MoveFile(".", outputDir, "bomber-results")
+	utils.MoveFile(currentDir, outputDir, "bomber-results")
 
 	return true
 }

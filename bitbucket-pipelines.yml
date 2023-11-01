@@ -53,7 +53,6 @@ pipelines:
       - step:
           name: 'Publish Dev Docker Image'
           deployment: Development
-          trigger: manual
           script:
             - echo ${DOCKERHUB_PASSWORD} | docker login --username "${DOCKERHUB_USERNAME}" --password-stdin
             - docker load --input "${BITBUCKET_REPO_SLUG}.tar"
@@ -61,6 +60,51 @@ pipelines:
             - docker push "${DOCKERHUB_NAMESPACE}/${BITBUCKET_REPO_SLUG}:${DEV_VERSION}-${BITBUCKET_BUILD_NUMBER}"
           services:
             - docker
+    Live Test:
+      - variables:
+          - name: PIPE_VERSION_SBOM_UTILS
+          - name: PIPE_VERSUIB_CYCLONEDX_GEN
+      - step:
+          name: Install npm dependencies
+          image: node:16
+          caches:
+            - node
+          script:
+            - npm install axios
+          artifacts:
+            - package.json
+            - package-lock.json
+      - step:
+          name: Gen CycloneDX sBOM
+          caches:
+            - node
+          script:
+            - pipe: docker://ccideas/cyclonedx-npm-pipe:${PIPE_VERSUIB_CYCLONEDX_GEN}
+              variables:
+                  IGNORE_NPM_ERRORS: 'true'
+                  NPM_SHORT_PURLS: 'true'
+                  NPM_OUTPUT_FORMAT: 'json'
+                  NPM_PACKAGE_LOCK_ONLY: 'false'
+                  SCAN_SBOM_WITH_BOMBER: 'false'
+                  OUTPUT_DIRECTORY: 'build'
+                  SBOM_FILENAME: 'sample-sbom'
+          artifacts:
+              - build/*
+      - step:
+          name: Scan SBOM
+          script:
+              # the build directory is owned by root but the pipe runs as the bitbucket-user
+              # change the permission to allow the pipe to write to the build directory
+              - chmod 777 build
+              - pipe: docker://ccideas/sbom-utilities-pipe:${PIPE_VERSION_SBOM_UTILS}
+                variables:
+                    PATH_TO_SBOM: 'build/sample-sbom.json'
+                    SCAN_SBOM_WITH_BOMBER: 'true'
+                    BOMBER_OUTPUT_FORMAT: 'html'
+                    BOMBER_DEBUG: 'true'
+                    OUTPUT_DIRECTORY: 'build'
+          artifacts:
+              - build/*
     Prod Release:
       - variables:
           - name: PRODUCTION_VERSION

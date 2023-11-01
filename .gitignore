@@ -1,4 +1,5 @@
 output/
+build/
 
 # test output
 profile.out
@@ -10,3 +11,8 @@ tmp.out
 sbom-utils
 sbom-utilities
 bin/
+
+# node
+node_modules/
+package.json
+package-lock.json

@@ -111,9 +111,10 @@ func RunLiveBashCommand(command string) error {
 func MoveFile(directoryPath string, dest string, contains string) bool {
 
 	// Open the directory
+	LogInfo.Print("attempting to open: ", directoryPath)
 	dir, err := os.Open(directoryPath)
 	if err != nil {
-		LogError.Print("error opening directory:", err)
+		LogError.Print("error opening directory: ", err)
 		return false
 	}
 	defer dir.Close()
@@ -122,6 +123,19 @@ func MoveFile(directoryPath string, dest string, contains string) bool {
 	files, err := dir.Readdir(-1) // -1 means to read all entries
 	if err != nil {
 		LogError.Print("error reading directory:", err)
+		return false
+	}
+
+	//create the destination dir if it does not exit
+	if _, err := os.Stat(dest); os.IsNotExist(err) {
+		// Directory doesn't exist, create it
+		if err := os.Mkdir(dest, 0755); err != nil {
+			LogError.Print(err)
+			return false
+		}
+		LogInfo.Print("Directory created:", dest)
+	} else if err != nil {
+		LogError.Print(err)
 		return false
 	}
 

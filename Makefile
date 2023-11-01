@@ -38,6 +38,11 @@ clean:
 	$(shell rm -rf output)
 	$(shell rm coverage.out)
 	$(shell rm sbom-utilities)
+	$(shell rm -rf build)
+	$(shell rm *-bomber-results.*)
+	$(shell rm package.json)
+	$(shell rm package-lock.json)
+	$(shell rm -rf node_modules)
 
 .PHONY: build
 build:
