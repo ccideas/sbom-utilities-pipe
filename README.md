@@ -58,6 +58,9 @@ pipelines:
         caches:
           - node
         script:
+          # the build directory is owned by root but the pipe runs as the bitbucket-user
+          # change the permission to allow the pipe to write to the build directory
+          - chmod 777 build
           - pipe: docker://ccideas/cyclonedx-npm-pipe:1.2.0
             variables:
               IGNORE_NPM_ERRORS: 'true' # optional
