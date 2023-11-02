@@ -70,7 +70,7 @@ pipelines:
   - step:
       name: Process sBOM
       script:
-        - pipe: docker://ccideas/sbom-utilities-pipe:1.0.0
+        - pipe: docker://ccideas/sbom-utilities-pipe:1.0.2
           variables:
             PATH_TO_SBOM: "build/${BITBUCKET_REPO_SLUG}.json"
             SCAN_SBOM_WITH_BOMBER: 'true'
@@ -98,7 +98,7 @@ pipelines:
 
 ## Need an sBOM
 
-This project contains some sample sBOMs which can be found in the sample-sboms directory.
+This project contains some sample sBOMs which can be found in the examples/sboms directory.
 To produce a sBOM for a given project you can use the following Bitbucket Pipe
 
 [cyclonedx-npm-pipe](https://github.com/ccideas/cyclonedx-npm-pipe)
