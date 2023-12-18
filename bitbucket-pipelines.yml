@@ -99,10 +99,11 @@ pipelines:
               - pipe: docker://ccideas/sbom-utilities-pipe:${PIPE_VERSION_SBOM_UTILS}
                 variables:
                     PATH_TO_SBOM: 'build/sample-sbom.json'
-                    SCAN_SBOM_WITH_BOMBER: 'true'
+                    SCAN_SBOM_WITH_BOMBER: 'false'
                     BOMBER_OUTPUT_FORMAT: 'html'
                     BOMBER_DEBUG: 'true'
                     OUTPUT_DIRECTORY: 'build'
+                    SCAN_SBOM_WITH_SBOMQS: 'true'
           artifacts:
               - build/*
     Prod Release:

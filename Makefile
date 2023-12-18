@@ -10,7 +10,7 @@ DOCKER ?= docker
 
 .PHONY: test
 test:
-	$(GO) test $(TESTTAGS) -covermode=count -coverprofile=profile.out sbom-utilities/utils
+	$(GO) test $(TESTTAGS) -covermode=count -coverprofile=profile.out sbom-utilities/utils sbom-utilities/sbomqs
 
 .PHONY: fmt
 fmt:
@@ -58,7 +58,11 @@ docker-amd64:
 
 .PHONY: docker-run
 docker-run:
-	$(DOCKER) run --rm -it sbom-utilities-pipe:dev
+	$(DOCKER) run --rm -it --workdir /tmp -v $(PWD)/examples:/tmp/examples --env-file variables.list sbom-utilities-pipe:dev
+
+.PHONY: docker-debug
+docker-debug:
+	$(DOCKER) run --rm -it --workdir /tmp -v $(PWD)/examples:/tmp/examples --env-file variables.list --entrypoint bash sbom-utilities-pipe:dev
 
 .PHONY: docker-lint
 docker-lint:

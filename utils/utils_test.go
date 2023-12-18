@@ -84,7 +84,7 @@ func TestRunLiveBashCommand(t *testing.T) {
 	command := "echo 'Hello, World!'"
 
 	//when
-	err := RunLiveBashCommand(command)
+	err := RunLiveBashCommand(command, "")
 
 	//then
 	assert.NoError(t, err, "expected no error but got one")
@@ -95,7 +95,7 @@ func TestRunLiveBashCommandFailure(t *testing.T) {
 	command := "'Hello, World!'"
 
 	//when
-	err := RunLiveBashCommand(command)
+	err := RunLiveBashCommand(command, "")
 
 	//then
 	assert.Error(t, err, "expexted an error but did not get one")
