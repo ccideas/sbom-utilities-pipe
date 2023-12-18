@@ -3,11 +3,13 @@ package utils
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 var (
@@ -26,7 +28,6 @@ func RunBashCommand(command string) (string, error) {
 	}
 
 	outputStr := strings.TrimSpace(string(output))
-	fmt.Println(outputStr)
 	return outputStr, nil
 }
 
@@ -60,7 +61,20 @@ func CheckFileExists(filename string) bool {
 	return false
 }
 
-func RunLiveBashCommand(command string) error {
+func RunLiveBashCommand(command string, outputPath string) error {
+	var outputFile io.Writer
+
+	if outputPath != "" {
+		file, err := os.Create(outputPath)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		outputFile = file
+		LogInfo.Print("output will be written to " + outputPath)
+	} else {
+		outputFile = nil
+	}
 
 	cmd := exec.Command("bash", "-c", command)
 
@@ -86,7 +100,11 @@ func RunLiveBashCommand(command string) error {
 		scanner := bufio.NewScanner(stdout)
 		for scanner.Scan() {
 			line := scanner.Text()
-			LogInfo.Print(line)
+			if outputFile == nil {
+				LogInfo.Print(line)
+			} else {
+				_, _ = fmt.Fprintln(outputFile, line)
+			}
 		}
 	}()
 
@@ -95,7 +113,11 @@ func RunLiveBashCommand(command string) error {
 		scanner := bufio.NewScanner(stderr)
 		for scanner.Scan() {
 			line := scanner.Text()
-			LogDebug.Print(line)
+			if outputFile == nil {
+				LogDebug.Print(line)
+			} else {
+				_, _ = fmt.Fprintln(outputFile, line)
+			}
 		}
 	}()
 
@@ -177,4 +199,18 @@ func VerifyOrCreateDirectory(directory string) bool {
 	}
 
 	return true
+}
+
+func GetUTCTime() time.Time {
+
+	return time.Now().UTC()
+}
+
+func GetBitbucketRepoSlug() string {
+
+	if bitbucketRepoSlug, isSet := CheckEnvVar("BITBUCKET_REPO_SLUG"); isSet {
+		return bitbucketRepoSlug
+	} else {
+		return ""
+	}
 }

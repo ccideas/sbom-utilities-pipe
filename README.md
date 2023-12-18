@@ -13,9 +13,10 @@ The following tooling/functionally is currently available in this pipe
 
 ### Current Tools
 
-| Tool/Feature | Description |
-| ------------ | ----------- |
-| [devops-kung-fu/bomber](https://github.com/devops-kung-fu/bomber) | Scans Software Bill of Materials (SBOMs) for security vulnerabilities |
+| Tool/Feature | Description | From Version |
+| ------------ | ----------- | ----------- |
+| [devops-kung-fu/bomber](https://github.com/devops-kung-fu/bomber) | Scans Software Bill of Materials (SBOMs) for security vulnerabilities | [1.0.0](https://github.com/ccideas/sbom-utilities-pipe/releases) |
+| [interlynk-io/sbomqs](https://github.com/interlynk-io/sbomqs) | SBOM quality score - Quality metrics for your sboms | [1.1.0](https://github.com/ccideas/sbom-utilities-pipe/releases) |
 
 ### Future Tools & Featurs
 
@@ -26,7 +27,6 @@ vote to have a specific tool/feature integreted next, [open an issue](https://gi
 | ------------ | ----------- |
 | [anchore/grype](https://github.com/anchore/grype) | A vulnerability scanner for container images and filesystems |
 | sBOM Signing | Sign the sBOM using your priviate key to prove ownership |
-| [interlynk-io/sbomqs](https://github.com/interlynk-io/sbomqs)| SBOM quality score - Quality metrics for your sboms |
 | Distribution API | Send your sBOM to servers such as DependencyTrack for storage and further analysis |
 
 And more
@@ -40,7 +40,8 @@ The following is an example of a Bitbucket Pipeline which performs the following
 3. Uses sbom-utilities-pipe to furter process the sBOM
 
 In the following example the sbom-utilities-pipe scans the sBOM for vulnerabilities using
-devops-kung-fu/bomber. The following code snip would need to be added to
+devops-kung-fu/bomber then scans the sbom to generate a quality score using interlynk-io/sbomqs.
+The following code snip would need to be added to
 the `bitbucket-pipelines.yml` file
 
 ```yaml
@@ -76,10 +77,12 @@ pipelines:
         - pipe: docker://ccideas/sbom-utilities-pipe:1.0.2
           variables:
             PATH_TO_SBOM: "build/${BITBUCKET_REPO_SLUG}.json"
-            SCAN_SBOM_WITH_BOMBER: 'true'
+            SCAN_SBOM_WITH_BOMBER: 'true' # to enable a bomber scan
             BOMBER_OUTPUT_FORMAT: 'html'
             BOMBER_DEBUG: 'true'
             OUTPUT_DIRECTORY: 'build'
+            SCAN_SBOM_WITH_SBOMQS: 'true' # to enable an sbomqs scan
+            SBOMQS_OUTPUT_FORMAT: 'json'
         artifacts:
           - build/*
 
@@ -97,6 +100,8 @@ pipelines:
 | BOMBER_PROVIDER_TOKEN     | Used to specify an API token for the selected provider              | <provider apitoken>             | none          | false    |
 | BOMBER_PROVIDER_USERNAME  | Used to specify an username for the selected provider               | <provider username>             | none          | false    |
 | BOMBER_OUTPUT_FORMAT      | Used to specify the output format of the bomber scan                | json, html, stdout              | stdout        | false    |
+| SCAN_SBOM_WITH_SBOMQS     | Used to scan the sBOM in order to generate a quality quality score  | true, false                     | false         | false    |
+| SBOMQS_OUTPUT_FORMAT      | Used to specify the output format of the sbomqs scan                | detailed, json                  | detailed      | false    |
 | OUTPUT_DIRECTORY          | Used to specify the directory to place all output in                | <directory name>                | build         | false    |
 
 ## Need an sBOM
@@ -133,5 +138,6 @@ steps to reproduce
 This Bitbucket pipe is a collection and integration of the following open source tools
 
 * [bomber](https://github.com/devops-kung-fu/bomber)
+* [interlynk-io/sbomqs](https://github.com/interlynk-io/sbomqs)
 
 A big thank-you to the teams and volunteers who make these amazing tools available

@@ -52,7 +52,7 @@ func GenBomberArgs() string {
 func ScanWithBomber(sbom string, switches string, logger *log.Logger) (result bool) {
 	cmd := "bomber scan " + switches + " " + sbom
 	logger.Print("running the following command: " + cmd)
-	err := utils.RunLiveBashCommand(cmd)
+	err := utils.RunLiveBashCommand(cmd, "")
 
 	return err == nil
 }
