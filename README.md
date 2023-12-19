@@ -74,7 +74,7 @@ pipelines:
   - step:
       name: Process sBOM
       script:
-        - pipe: docker://ccideas/sbom-utilities-pipe:1.0.2
+        - pipe: docker://ccideas/sbom-utilities-pipe:1.1.1
           variables:
             PATH_TO_SBOM: "build/${BITBUCKET_REPO_SLUG}.json"
             SCAN_SBOM_WITH_BOMBER: 'true' # to enable a bomber scan
