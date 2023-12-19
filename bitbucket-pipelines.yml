@@ -142,6 +142,8 @@ pipelines:
                   - git remote add github "git@github.com:ccideas/sbom-utilities-pipe.git"
                   - git checkout ${BITBUCKET_BRANCH}
                   - git pull
+                  - git fetch github
+                  - git rebase github/main
                   - git push github ${BITBUCKET_BRANCH}
                   - git push github "v${PRODUCTION_VERSION}"
                   - rm id_ed25519_github_sbom-utilities-pipe_deploy
