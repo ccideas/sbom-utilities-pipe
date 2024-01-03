@@ -113,3 +113,13 @@ func TestVerifyOrCreateDirectory(t *testing.T) {
 	result = VerifyOrCreateDirectory(testDir)
 	assert.True(t, result, "expected directory to exist, but it didn't")
 }
+
+func TestSetEnvVariable(t *testing.T) {
+	// set env variable - string
+	envName := "THIS_IS_MY_ENV_VARIABLE"
+	envValue := "THIS_IS_MY_ENV_VARIABLE_VALUE"
+	result := SetEnvVariable(envName, envValue)
+
+	assert.Empty(t, result, "expected result to be empty")
+	assert.Equal(t, os.Getenv(envName), envValue, "expected env variables to match")
+}

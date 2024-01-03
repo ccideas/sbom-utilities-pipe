@@ -214,3 +214,16 @@ func GetBitbucketRepoSlug() string {
 		return ""
 	}
 }
+
+func SetEnvVariable(name string, value string) error {
+
+	err := os.Setenv(name, value)
+
+	if err != nil {
+		LogError.Print("Error setting environment variable: " + name)
+		LogError.Print(err)
+		return err
+	}
+
+	return nil
+}
