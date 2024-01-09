@@ -89,6 +89,18 @@ func scanWithBomber(sbomFile string, outputDir string) bool {
 
 func scanWithSbomqs(sbomFile string, outputDir string) (result bool) {
 	LogInfo.Print("scanning sbom via sbomqs")
+
+	// set INTERLYNK_DISABLE_VERSION_CHECK to true to diable the API call to github
+	// This API call often hits a rate limit issue when running on BitBucket and
+	// in turn fails the pipelien.
+	// Since the sbomqs package is updated on a regular bases it is safe to disable
+	// this check
+	res := utils.SetEnvVariable("INTERLYNK_DISABLE_VERSION_CHECK", "true")
+
+	if res != nil {
+		LogError.Print("error when setting environment variable")
+	}
+
 	sbomqs.CheckSbomqsVersion()
 
 	sbomqsArgs := sbomqs.GenSbomqsArgs()

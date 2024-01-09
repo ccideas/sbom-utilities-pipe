@@ -1,5 +1,5 @@
 PATH_TO_SBOM=examples/sboms/sample-sbom.json
-SCAN_SBOM_WITH_BOMBER=false
+SCAN_SBOM_WITH_BOMBER=true
 BOMBER_OUTPUT_FORMAT=html
 BOMBER_DEBUG=true
 OUTPUT_DIRECTORY=build
