@@ -132,19 +132,4 @@ pipelines:
                 script:
                   - git tag -a "v${PRODUCTION_VERSION}" -m "release version ${PRODUCTION_VERSION}"
                   - git push origin "v${PRODUCTION_VERSION}"
-            - step:
-                name: push branch to github
-                image: alpine/git:1.0.26
-                script:
-                  - echo -n ${GITHUB_DEPLOY_KEY} | base64 -d > id_ed25519_github_sbom-utilities-pipe_deploy
-                  - chmod 600 id_ed25519_github_sbom-utilities-pipe_deploy
-                  - export GIT_SSH_COMMAND="ssh -i id_ed25519_github_sbom-utilities-pipe_deploy"
-                  - git remote add github "git@github.com:ccideas/sbom-utilities-pipe.git"
-                  - git checkout ${BITBUCKET_BRANCH}
-                  - git pull
-                  - git fetch github
-                  - git rebase github/main
-                  - git push github ${BITBUCKET_BRANCH}
-                  - git push github "v${PRODUCTION_VERSION}"
-                  - rm id_ed25519_github_sbom-utilities-pipe_deploy
       
