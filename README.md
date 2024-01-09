@@ -16,7 +16,7 @@ The following tooling/functionally is currently available in this pipe
 | Tool/Feature | Description | From Version |
 | ------------ | ----------- | ----------- |
 | [devops-kung-fu/bomber](https://github.com/devops-kung-fu/bomber) | Scans Software Bill of Materials (SBOMs) for security vulnerabilities | [1.0.0](https://github.com/ccideas/sbom-utilities-pipe/releases) |
-| [interlynk-io/sbomqs](https://github.com/interlynk-io/sbomqs) | SBOM quality score - Quality metrics for your sboms | [1.1.0](https://github.com/ccideas/sbom-utilities-pipe/releases) |
+| [interlynk-io/sbomqs](https://github.com/interlynk-io/sbomqs) | SBOM quality score - Quality metrics for your sboms | [1.1.1](https://github.com/ccideas/sbom-utilities-pipe/releases) |
 
 ### Future Tools & Featurs
 
@@ -77,7 +77,7 @@ pipelines:
         # the build directory is owned by root but the pipe runs as the bitbucket-user
         # change the permission to allow the pipe to write to the build directory
         - chmod 777 build
-        - pipe: docker://ccideas/sbom-utilities-pipe:1.1.1
+        - pipe: docker://ccideas/sbom-utilities-pipe:1.1.2
           variables:
             PATH_TO_SBOM: "build/${BITBUCKET_REPO_SLUG}.json"
             SCAN_SBOM_WITH_BOMBER: 'true' # to enable a bomber scan
