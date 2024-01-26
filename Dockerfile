@@ -17,7 +17,7 @@ ARG ARCH
 ENV SBOM_UTILITIES_MODULE_HOME="/opt/sbom-utilities" \
     BASH_VERSION="5.2.15-r5" \
     BOMBER_VERSION="0.4.8" \
-    SBOMQS_VERSION="v0.0.28"
+    SBOMQS_VERSION="v0.0.29"
     
 RUN apk --no-cache add bash=${BASH_VERSION}
 

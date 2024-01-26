@@ -23,7 +23,7 @@ read -r answer
 if [[ "${answer}" =~ ^[Yy]$ ]]; then
     echo "Continuing..."
     export GIT_SSH_COMMAND="ssh -i ${GITHUB_DEPLOY_KEY_SBOM_UTILITIES}"
-    git remote add github "git@github.com:ccideas/sbom-utilities-pipe.git"
+    git remote add github "git@github.com:ccideas/sbom-utilities-pipe.git" || echo "already added remote"
     git push github ${BRANCH_TO_PUSH_TO_GITHUB}
 else
     echo "Exiting..."
