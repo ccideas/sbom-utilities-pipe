@@ -63,7 +63,7 @@ pipelines:
     Live Test:
       - variables:
           - name: PIPE_VERSION_SBOM_UTILS
-          - name: PIPE_VERSUIB_CYCLONEDX_GEN
+          - name: PIPE_VERSION_CYCLONEDX_GEN
       - step:
           name: Install npm dependencies
           image: node:16
@@ -79,7 +79,7 @@ pipelines:
           caches:
             - node
           script:
-            - pipe: docker://ccideas/cyclonedx-npm-pipe:${PIPE_VERSUIB_CYCLONEDX_GEN}
+            - pipe: docker://ccideas/cyclonedx-npm-pipe:${PIPE_VERSION_CYCLONEDX_GEN}
               variables:
                   IGNORE_NPM_ERRORS: 'true'
                   NPM_SHORT_PURLS: 'true'
