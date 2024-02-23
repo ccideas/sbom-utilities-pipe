@@ -105,6 +105,8 @@ pipelines:
                     OUTPUT_DIRECTORY: 'build'
                     SCAN_SBOM_WITH_SBOMQS: 'true'
                     SBOMQS_OUTPUT_FORMAT: 'json'
+                    SCAN_SBOM_WITH_OSV: 'true'
+                    OSV_OUTPUT_FORMAT: 'json'
           artifacts:
               - build/*
     Prod Release:

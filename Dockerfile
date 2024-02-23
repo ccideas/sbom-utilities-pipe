@@ -1,6 +1,6 @@
 # build stage
 
-FROM golang:1.21.1-alpine3.18 AS builder
+FROM golang:1.21.7-alpine3.18 AS builder
 
 # copy source and build
 COPY . /build
@@ -10,13 +10,14 @@ RUN go build -o bin/sbom-utils
 
 # runtime stage
 
-FROM golang:1.21.1-alpine3.18
+FROM golang:1.21.7-alpine3.18
 
 ARG ARCH
 
 ENV SBOM_UTILITIES_MODULE_HOME="/opt/sbom-utilities" \
     BASH_VERSION="5.2.15-r5" \
     BOMBER_VERSION="0.4.8" \
+    OSV_SCANNER_VERSION="v1.6.2" \
     SBOMQS_VERSION="v0.0.29"
     
 RUN apk --no-cache add bash=${BASH_VERSION}
@@ -36,7 +37,8 @@ RUN wget ${BOMBER_URL} --quiet \
     && cp ${SBOMQS_FILENAME} /opt/sbomqs \
     && chmod +x /opt/sbomqs/${SBOMQS_FILENAME} \
     && ln -s /opt/sbomqs/${SBOMQS_FILENAME} /opt/sbomqs/sbomqs \
-    && chmod +x /opt/sbomqs/sbomqs
+    && chmod +x /opt/sbomqs/sbomqs \
+    && go install github.com/google/osv-scanner/cmd/osv-scanner@${OSV_SCANNER_VERSION}
 
 COPY --from=builder /build/bin/sbom-utils ${SBOM_UTILITIES_MODULE_HOME}/bin/sbom-utils
 
