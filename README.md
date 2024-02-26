@@ -108,7 +108,7 @@ pipelines:
 | SBOMQS_OUTPUT_FORMAT      | Used to specify the output format of the sbomqs scan                | detailed, json                  | detailed      | false    |
 | SCAN_SBOM_WITH_OSV        | Used to scan the sBOM for vulberabilities                           | true, false                     | false         | false    |
 | OSV_OUTPUT_FORMAT         | Used to specify the output format of the osv scan                   | table, json, markdown, sarif    | json          | false    |
-| OSV_OUTPUT_FILENAME       | Used to specify the filename to store the osv scan output           | <filanema>                      | auto-generated| false
+| OSV_OUTPUT_FILENAME       | Used to specify the filename to store the osv scan output           | <filename>                      | auto-generated| false
 | OUTPUT_DIRECTORY          | Used to specify the directory to place all output in                | <directory name>                | build         | false    |
 
 ## Need an sBOM
@@ -116,8 +116,8 @@ pipelines:
 This project contains some sample sBOMs which can be found in the examples/sboms directory.
 To produce a sBOM for a given project you can use any of the following Bitbucket Pipe
 
-[cyclonedx-npm-pipe](https://github.com/ccideas/cyclonedx-npm-pipe)
-[cyclonedx-bitbucket-pipe](https://github.com/ccideas/cyclonedx-bitbucket-pipe)
+* [cyclonedx-npm-pipe](https://github.com/ccideas/cyclonedx-npm-pipe)
+* [cyclonedx-bitbucket-pipe](https://github.com/ccideas/cyclonedx-bitbucket-pipe)
 
 ## Live Example
 
