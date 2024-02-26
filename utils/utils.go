@@ -227,3 +227,21 @@ func SetEnvVariable(name string, value string) error {
 
 	return nil
 }
+
+func GenerateFilename(prefix string, format string) string {
+	repoSlug := GetBitbucketRepoSlug()
+
+	var name string
+	if repoSlug != "" {
+		name = prefix + "_" + repoSlug
+	} else {
+		name = prefix
+	}
+
+	currentTime := GetUTCTime()
+	timeString := currentTime.Format("20060102-15-04-05")
+
+	outputfilename := name + "_" + timeString + "." + format
+
+	return outputfilename
+}

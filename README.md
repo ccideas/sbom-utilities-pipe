@@ -17,6 +17,7 @@ The following tooling/functionally is currently available in this pipe
 | ------------ | ----------- | ----------- |
 | [devops-kung-fu/bomber](https://github.com/devops-kung-fu/bomber) | Scans Software Bill of Materials (SBOMs) for security vulnerabilities | [1.0.0](https://github.com/ccideas/sbom-utilities-pipe/releases) |
 | [interlynk-io/sbomqs](https://github.com/interlynk-io/sbomqs) | SBOM quality score - Quality metrics for your sboms | [1.1.1](https://github.com/ccideas/sbom-utilities-pipe/releases) |
+| [osv-scanner](https://github.com/google/osv-scanner)| Vulnerability scanner which uses the data provided by the [osv.dev](https://osv.dev) | [1.2.0](https://github.com/ccideas/sbom-utilities-pipe/releases) |
 
 ### Future Tools & Featurs
 
@@ -25,7 +26,6 @@ vote to have a specific tool/feature integreted next, [open an issue](https://gi
 
 | Tool/Feature | Description |
 | ------------ | ----------- |
-| [anchore/grype](https://github.com/anchore/grype) | A vulnerability scanner for container images and filesystems |
 | sBOM Signing | Sign the sBOM using your priviate key to prove ownership |
 | Distribution API | Send your sBOM to servers such as DependencyTrack for storage and further analysis |
 
@@ -36,7 +36,7 @@ And more
 The following is an example of a Bitbucket Pipeline which performs the following:
 
 1. Installes dependencies for a npm project
-2. Produces a sBOM via [cyclonedx-npm-pipe](https://github.com/ccideas/cyclonedx-npm-pipe)
+2. Produces a sBOM via [cyclonedx-npm-pipe](https://github.com/ccideas/cyclonedx-npm-pipe) or [cyclonedx-bitbucket-pipe](https://github.com/ccideas/cyclonedx-bitbucket-pipe)
 3. Uses sbom-utilities-pipe to furter process the sBOM
 
 In the following example the sbom-utilities-pipe scans the sBOM for vulnerabilities using
@@ -62,7 +62,7 @@ pipelines:
           # the build directory is owned by root but the pipe runs as the bitbucket-user
           # change the permission to allow the pipe to write to the build directory
           - chmod 777 build
-          - pipe: docker://ccideas/cyclonedx-npm-pipe:1.2.1
+          - pipe: docker://ccideas/cyclonedx-npm-pipe:1.3.0
             variables:
               IGNORE_NPM_ERRORS: 'true' # optional
               NPM_SHORT_PURLS: 'true' # optional
@@ -77,7 +77,7 @@ pipelines:
         # the build directory is owned by root but the pipe runs as the bitbucket-user
         # change the permission to allow the pipe to write to the build directory
         - chmod 777 build
-        - pipe: docker://ccideas/sbom-utilities-pipe:1.1.3
+        - pipe: docker://ccideas/sbom-utilities-pipe:1.2.0
           variables:
             PATH_TO_SBOM: "build/${BITBUCKET_REPO_SLUG}.json"
             SCAN_SBOM_WITH_BOMBER: 'true' # to enable a bomber scan
@@ -86,9 +86,10 @@ pipelines:
             OUTPUT_DIRECTORY: 'build'
             SCAN_SBOM_WITH_SBOMQS: 'true' # to enable an sbomqs scan
             SBOMQS_OUTPUT_FORMAT: 'json'
+            SCAN_SBOM_WITH_OSV: 'true' # to enable an osv scan
+            OSV_OUTPUT_FORMAT: 'json'
         artifacts:
           - build/*
-
 ```
 
 ## Variables
@@ -105,14 +106,18 @@ pipelines:
 | BOMBER_OUTPUT_FORMAT      | Used to specify the output format of the bomber scan                | json, html, stdout              | stdout        | false    |
 | SCAN_SBOM_WITH_SBOMQS     | Used to scan the sBOM in order to generate a quality quality score  | true, false                     | false         | false    |
 | SBOMQS_OUTPUT_FORMAT      | Used to specify the output format of the sbomqs scan                | detailed, json                  | detailed      | false    |
+| SCAN_SBOM_WITH_OSV        | Used to scan the sBOM for vulberabilities                           | true, false                     | false         | false    |
+| OSV_OUTPUT_FORMAT         | Used to specify the output format of the osv scan                   | table, json, markdown, sarif    | json          | false    |
+| OSV_OUTPUT_FILENAME       | Used to specify the filename to store the osv scan output           | <filename>                      | auto-generated| false
 | OUTPUT_DIRECTORY          | Used to specify the directory to place all output in                | <directory name>                | build         | false    |
 
 ## Need an sBOM
 
 This project contains some sample sBOMs which can be found in the examples/sboms directory.
-To produce a sBOM for a given project you can use the following Bitbucket Pipe
+To produce a sBOM for a given project you can use any of the following Bitbucket Pipe
 
-[cyclonedx-npm-pipe](https://github.com/ccideas/cyclonedx-npm-pipe)
+* [cyclonedx-npm-pipe](https://github.com/ccideas/cyclonedx-npm-pipe)
+* [cyclonedx-bitbucket-pipe](https://github.com/ccideas/cyclonedx-bitbucket-pipe)
 
 ## Live Example
 
@@ -142,5 +147,6 @@ This Bitbucket pipe is a collection and integration of the following open source
 
 * [bomber](https://github.com/devops-kung-fu/bomber)
 * [interlynk-io/sbomqs](https://github.com/interlynk-io/sbomqs)
+* [osv-scanner](https://github.com/google/osv-scanner)
 
 A big thank-you to the teams and volunteers who make these amazing tools available

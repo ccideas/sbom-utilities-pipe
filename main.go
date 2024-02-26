@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"sbom-utilities/bomber"
+	"sbom-utilities/osv"
 	"sbom-utilities/sbomqs"
 	"sbom-utilities/utils"
 	"sbom-utilities/version"
@@ -61,6 +62,11 @@ func main() {
 	if utils.CheckIfEnvVarIsTrue("SCAN_SBOM_WITH_SBOMQS") {
 		scanWithSbomqs(sbomFile, outputDir)
 	}
+
+	// osv-scanner
+	if utils.CheckIfEnvVarIsTrue("SCAN_SBOM_WITH_OSV") {
+		scanWithOsv(sbomFile, outputDir)
+	}
 }
 
 func scanWithBomber(sbomFile string, outputDir string) bool {
@@ -104,7 +110,7 @@ func scanWithSbomqs(sbomFile string, outputDir string) (result bool) {
 	sbomqs.CheckSbomqsVersion()
 
 	sbomqsArgs := sbomqs.GenSbomqsArgs()
-	LogInfo.Print("the following bomber args will be used: " + sbomqsArgs)
+	LogInfo.Print("the following sbomqs args will be used: " + sbomqsArgs)
 
 	sbomqsFilename := sbomqs.GenOutputFilename()
 	LogInfo.Print("sbomqs results will be written to: " + sbomqsFilename)
@@ -116,6 +122,26 @@ func scanWithSbomqs(sbomFile string, outputDir string) (result bool) {
 	}
 
 	utils.MoveFile(currentDir, outputDir, "sbomqs-results")
+
+	return true
+}
+
+func scanWithOsv(sbomFile string, outputDir string) (result bool) {
+	LogInfo.Print("scanning sbom via osv-scanner")
+
+	osv.CheckOsvScannerVersion()
+
+	osvArgs := osv.GenOsvArgs()
+	LogInfo.Print("the following osv-scanner args will be used: " + osvArgs)
+
+	osv.ScanWithOsvScanner(sbomFile, osvArgs, "", LogInfo)
+
+	currentDir, err := utils.RunBashCommand("pwd")
+	if err != nil {
+		LogError.Print("cant get current directory")
+	}
+
+	utils.MoveFile(currentDir, outputDir, "osv-scan")
 
 	return true
 }
