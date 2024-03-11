@@ -51,10 +51,10 @@ definitions:
             - apt-get install -y curl
             - curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin v1.0.1
             - docker load --input "${BITBUCKET_REPO_SLUG}.tar"
-            - mkdir sbom_output
-            - syft "${BITBUCKET_REPO_SLUG}:local" --output cyclonedx-json >> sbom_output/${BITBUCKET_REPO_SLUG}_cyclonedx-sbom.json
+            - mkdir build
+            - syft "${BITBUCKET_REPO_SLUG}:local" --output cyclonedx-json >> build/${BITBUCKET_REPO_SLUG}_cyclonedx-sbom.json
           artifacts:
-            - sbom_output/*
+            - build/*
 
 pipelines:
   default:
@@ -136,7 +136,6 @@ pipelines:
           name: Scan SBOM
           script:
               - chmod 777 build
-              - cp sbom_output/*.json build
               - pipe: docker://ccideas/sbom-utilities-pipe:1.2.0
                 variables:
                     PATH_TO_SBOM: 'build/${BITBUCKET_REPO_SLUG}_cyclonedx-sbom.json'
