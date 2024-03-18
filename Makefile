@@ -54,7 +54,7 @@ docker:
 
 .PHONY: docker-amd64
 docker-amd64:
-	$(DOCKER) buildx build --platform linux/amd64 --tag sbom-utilities-pipe:dev .
+	$(DOCKER) buildx build --build-arg ARCH=amd64 --platform linux/amd64 --tag sbom-utilities-pipe:dev .
 
 .PHONY: docker-run
 docker-run:
