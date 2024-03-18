@@ -57,14 +57,24 @@ definitions:
             - sbom_output/*
 
 pipelines:
-  default:
-    - parallel:
+  pull-requests:
+    '**':
+      - parallel:
         - step: *docker-lint
         - step: *build-docker-image
         - step: *build-test
         - step: *go-formatter
         - step: *go-lint-yourself
-    - step: *gen-sbom-for-project
+      - step: *gen-sbom-for-project
+  branches:
+    main:
+      - parallel:
+        - step: *docker-lint
+        - step: *build-docker-image
+        - step: *build-test
+        - step: *go-formatter
+        - step: *go-lint-yourself
+      - step: *gen-sbom-for-project
   custom:
     push to Dockerhub (dev):
       - step: *build-docker-image
