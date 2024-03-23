@@ -20,15 +20,13 @@ ENV SBOM_UTILITIES_MODULE_HOME="/opt/sbom-utilities" \
     OSV_SCANNER_VERSION="v1.7.0" \
     SBOMQS_VERSION="v0.0.30"
     
-RUN apk --no-cache add bash=${BASH_VERSION}
+ARG BOMBER_URL="https://github.com/devops-kung-fu/bomber/releases/download/v${BOMBER_VERSION}/bomber_${BOMBER_VERSION}_linux_${ARCH}.tar.gz" \
+    BOMBER_FILENAME="bomber_${BOMBER_VERSION}_linux_${ARCH}.tar.gz" \
+    SBOMQS_URL="https://github.com/interlynk-io/sbomqs/releases/download/${SBOMQS_VERSION}/sbomqs-linux-${ARCH}" \
+    SBOMQS_FILENAME="sbomqs-linux-${ARCH}"
 
-ARG BOMBER_URL="https://github.com/devops-kung-fu/bomber/releases/download/v${BOMBER_VERSION}/bomber_${BOMBER_VERSION}_linux_${ARCH}.tar.gz"
-ARG BOMBER_FILENAME="bomber_${BOMBER_VERSION}_linux_${ARCH}.tar.gz"
-ARG SBOMQS_URL="https://github.com/interlynk-io/sbomqs/releases/download/${SBOMQS_VERSION}/sbomqs-linux-${ARCH}"
-ARG SBOMQS_FILENAME="sbomqs-linux-${ARCH}"
-
-
-RUN wget ${BOMBER_URL} --quiet \
+RUN apk --no-cache add bash=${BASH_VERSION} \
+    && wget ${BOMBER_URL} --quiet \
     && mkdir -p /opt/bomber \
     && tar xf ${BOMBER_FILENAME} -C /opt/bomber \
     && rm ${BOMBER_FILENAME} \
@@ -38,7 +36,8 @@ RUN wget ${BOMBER_URL} --quiet \
     && chmod +x /opt/sbomqs/${SBOMQS_FILENAME} \
     && ln -s /opt/sbomqs/${SBOMQS_FILENAME} /opt/sbomqs/sbomqs \
     && chmod +x /opt/sbomqs/sbomqs \
-    && go install github.com/google/osv-scanner/cmd/osv-scanner@${OSV_SCANNER_VERSION}
+    && go install github.com/google/osv-scanner/cmd/osv-scanner@${OSV_SCANNER_VERSION} \
+    && go clean -cache -testcache -modcache -fuzzcache
 
 COPY --from=builder /build/bin/sbom-utils ${SBOM_UTILITIES_MODULE_HOME}/bin/sbom-utils
 
