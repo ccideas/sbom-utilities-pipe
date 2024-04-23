@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"os"
 	"os/exec"
@@ -13,9 +14,10 @@ import (
 )
 
 var (
-	LogInfo  = log.New(os.Stderr, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
-	LogError = log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
-	LogDebug = log.New(os.Stderr, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
+	LogInfo                       = log.New(os.Stderr, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+	LogError                      = log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+	LogDebug                      = log.New(os.Stderr, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
+	DEFAULT_DIRECTORY_PERMISSIONS = 0755
 )
 
 func RunBashCommand(command string) (string, error) {
@@ -173,6 +175,81 @@ func MoveFile(directoryPath string, dest string, contains string) bool {
 			} else {
 				LogInfo.Println("file moved successfully:", file.Name())
 			}
+		}
+	}
+
+	return true
+}
+
+func MoveFileToDestination(currentDir string, destDir string, fileToMove string, deleteSource bool) (result bool) {
+
+	CreateDir(destDir)
+
+	srcPath := filepath.Join(currentDir, fileToMove)
+	destPath := filepath.Join(destDir, fileToMove)
+
+	readFile, _ := OpenFile(srcPath)
+	writeFile, _ := CreateFile(destPath)
+	CopyFile(writeFile, readFile, deleteSource)
+
+	defer readFile.Close()
+	defer writeFile.Close()
+	return result
+}
+
+func CreateDir(dir string) (result bool) {
+
+	err := os.MkdirAll(dir, fs.FileMode(DEFAULT_DIRECTORY_PERMISSIONS))
+
+	if err != nil {
+		LogError.Print("Error creating destination directory", err)
+		return false
+	}
+
+	return true
+}
+
+func OpenFile(file string) (srcFile *os.File, ioresult bool) {
+
+	srcFile, err := os.Open(file)
+
+	if err != nil {
+		LogError.Print("Error opening file", err)
+		return nil, false
+	}
+
+	//defer srcFile.Close()
+	return srcFile, true
+}
+
+func CreateFile(path string) (destFile *os.File, result bool) {
+
+	destFile, err := os.Create(path)
+
+	if err != nil {
+		LogError.Print("Error creating destination file", err)
+		return nil, false
+	}
+
+	//defer destFile.Close()
+	return destFile, true
+}
+
+func CopyFile(dest *os.File, src *os.File, deleteSource bool) (result bool) {
+
+	_, err := io.Copy(dest, src)
+
+	if err != nil {
+		LogError.Print("Error copying file", err)
+		return false
+	}
+
+	if deleteSource {
+		err = os.Remove(src.Name())
+
+		if err != nil {
+			LogError.Print("Error removing file", err)
+			return false
 		}
 	}
 

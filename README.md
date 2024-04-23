@@ -18,6 +18,8 @@ The following tooling/functionally is currently available in this pipe
 | [devops-kung-fu/bomber](https://github.com/devops-kung-fu/bomber) | Scans Software Bill of Materials (SBOMs) for security vulnerabilities | [1.0.0](https://github.com/ccideas/sbom-utilities-pipe/releases) |
 | [interlynk-io/sbomqs](https://github.com/interlynk-io/sbomqs) | SBOM quality score - Quality metrics for your sboms | [1.1.1](https://github.com/ccideas/sbom-utilities-pipe/releases) |
 | [osv-scanner](https://github.com/google/osv-scanner)| Vulnerability scanner which uses the data provided by the [osv.dev](https://osv.dev) | [1.2.0](https://github.com/ccideas/sbom-utilities-pipe/releases) |
+| [grype](https://github.com/anchore/grype)| A vulnerability scanner for container images and filesystems | [1.4.0](https://github.com/ccideas/sbom-utilities-pipe/releases) |
+
 
 ### Future Tools & Featurs
 
@@ -77,7 +79,7 @@ pipelines:
         # the build directory is owned by root but the pipe runs as the bitbucket-user
         # change the permission to allow the pipe to write to the build directory
         - chmod 777 build
-        - pipe: docker://ccideas/sbom-utilities-pipe:1.2.0
+        - pipe: docker://ccideas/sbom-utilities-pipe:1.4.0
           variables:
             PATH_TO_SBOM: "build/${BITBUCKET_REPO_SLUG}.json"
             SCAN_SBOM_WITH_BOMBER: 'true' # to enable a bomber scan
@@ -88,6 +90,9 @@ pipelines:
             SBOMQS_OUTPUT_FORMAT: 'json'
             SCAN_SBOM_WITH_OSV: 'true' # to enable an osv scan
             OSV_OUTPUT_FORMAT: 'json'
+            SCAN_SBOM_WITH_GRYPE: 'true' # to enable a grype scan
+            GRYPE_ARGS: '--output table --add-cpes-if-none'
+            GRYPE_OUTPUT_FILENAME: 'grype-scan-results.txt'
         artifacts:
           - build/*
 ```
@@ -106,10 +111,14 @@ pipelines:
 | BOMBER_OUTPUT_FORMAT      | Used to specify the output format of the bomber scan                | json, html, stdout              | stdout        | false    |
 | SCAN_SBOM_WITH_SBOMQS     | Used to scan the sBOM in order to generate a quality quality score  | true, false                     | false         | false    |
 | SBOMQS_OUTPUT_FORMAT      | Used to specify the output format of the sbomqs scan                | detailed, json                  | detailed      | false    |
-| SCAN_SBOM_WITH_OSV        | Used to scan the sBOM for vulberabilities                           | true, false                     | false         | false    |
+| SCAN_SBOM_WITH_OSV        | Used to scan the sBOM for vulberabilities using osv scanner         | true, false                     | false         | false    |
 | OSV_OUTPUT_FORMAT         | Used to specify the output format of the osv scan                   | table, json, markdown, sarif    | json          | false    |
-| OSV_OUTPUT_FILENAME       | Used to specify the filename to store the osv scan output           | <filename>                      | auto-generated| false
+| OSV_OUTPUT_FILENAME       | Used to specify the filename to store the osv scan output           | <filename>                      | auto-generated| false    |
+| SCAN_SBOM_WITH_GRYPE      | Used to scan the sBOM for vulberabilities using the grype scanner   | true, false                     | false         | false    |
+| GRYPE_ARGS                | cmd args to use when running grype                                  | see grype --help for full list  |               | false    |
+| GRYPE_OUTPUT_FILENAME     | the file to write grype ouput to                                    | <filename>                      | auto-generated| false    |
 | OUTPUT_DIRECTORY          | Used to specify the directory to place all output in                | <directory name>                | build         | false    |
+
 
 ## Need an sBOM
 
@@ -148,5 +157,7 @@ This Bitbucket pipe is a collection and integration of the following open source
 * [bomber](https://github.com/devops-kung-fu/bomber)
 * [interlynk-io/sbomqs](https://github.com/interlynk-io/sbomqs)
 * [osv-scanner](https://github.com/google/osv-scanner)
+* [grype](https://github.com/anchore/grype)
+
 
 A big thank-you to the teams and volunteers who make these amazing tools available
