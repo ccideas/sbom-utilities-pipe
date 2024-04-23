@@ -1,10 +1,9 @@
 package utils
 
 import (
+	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestRunBashCommand(t *testing.T) {
@@ -122,4 +121,112 @@ func TestSetEnvVariable(t *testing.T) {
 
 	assert.Empty(t, result, "expected result to be empty")
 	assert.Equal(t, os.Getenv(envName), envValue, "expected env variables to match")
+}
+
+func TestCreateDir(t *testing.T) {
+	dir := t.TempDir()
+
+	assert.True(t, CreateDir(dir), "Expected directory creation to succeed")
+
+	_, err := os.Stat(dir)
+
+	assert.NoError(t, err, "Expected directory '%s' to be created, but it does not exist", dir)
+}
+
+func TestCreateDirFailure(t *testing.T) {
+	t.Skip("Skipping test since it fails on bitbucket due to always running as the root user")
+	invalidDir := "/invalidDir"
+
+	assert.False(t, CreateDir(invalidDir), "Expected directory creation to fail")
+}
+
+func TestOpenFile(t *testing.T) {
+
+	file, _ := os.CreateTemp("", "example.txt")
+	_, _ = file.WriteString("Temporary file for testing")
+	path := file.Name()
+
+	srcFile, ioResult := OpenFile(path)
+	assert.NotNil(t, srcFile, "Expected file to be opened successfully")
+	assert.True(t, ioResult, "Expected ioresult to be true")
+
+	defer os.Remove(path)
+}
+
+func TestOpenFileFailure(t *testing.T) {
+
+	invalidFilePath := "nonexistent_file.txt"
+
+	srcFile, ioResult := OpenFile(invalidFilePath)
+	assert.Nil(t, srcFile, "Expected file to be nil")
+	assert.False(t, ioResult, "Expected ioresult to be false")
+}
+
+func TestCreateFile(t *testing.T) {
+
+	file, _ := os.CreateTemp("", "example.txt")
+	_, _ = file.WriteString("Temporary file for testing")
+	path := file.Name()
+
+	destFile, result := CreateFile(path)
+	assert.NotNil(t, destFile, "Expected file to be created successfully")
+	assert.True(t, result, "Expected result to be true")
+
+	_, err := os.Stat(path)
+	assert.NoError(t, err, "Expected file '%s' to be created, but it does not exist", path)
+
+	defer os.Remove(path)
+}
+
+func TestCreateFileFailure(t *testing.T) {
+
+	invalidFilePath := "/invalid_path/test_file.txt"
+	destFile, result := CreateFile(invalidFilePath)
+	assert.Nil(t, destFile, "Expected file to be nil")
+	assert.False(t, result, "Expected result to be false")
+
+}
+
+func TestCopyFileNoDelete(t *testing.T) {
+
+	srcFile, err := os.CreateTemp("", "source_")
+	assert.NoError(t, err, "Error creating source file")
+	defer srcFile.Close()
+	defer os.Remove(srcFile.Name())
+
+	destFile, err := os.CreateTemp("", "destination_")
+	assert.NoError(t, err, "Error creating destination file")
+	defer destFile.Close()
+	defer os.Remove(destFile.Name())
+
+	_, err = srcFile.WriteString("Temporary content for testing")
+	assert.NoError(t, err, "Error writing to source file")
+
+	result := CopyFile(destFile, srcFile, false)
+	assert.True(t, result, "Expected file copying to succeed")
+
+	destFileInfo, err := destFile.Stat()
+	assert.NoError(t, err, "Error getting destination file info")
+	assert.NotEqual(t, 0, destFileInfo.Size(), "Expected destination file to have non-zero size")
+}
+
+func TestCopyFileDelete(t *testing.T) {
+
+	srcFile, err := os.CreateTemp("", "source_")
+	assert.NoError(t, err, "Error creating source file")
+	defer srcFile.Close()
+	defer os.Remove(srcFile.Name())
+
+	destFile, err := os.CreateTemp("", "destination_")
+	assert.NoError(t, err, "Error creating destination file")
+	defer destFile.Close()
+	defer os.Remove(destFile.Name())
+
+	result := CopyFile(destFile, srcFile, true)
+	assert.True(t, result, "Expected file copying with source deletion to succeed")
+
+	// Check if the source file is deleted
+	_, err = os.Stat(srcFile.Name())
+	assert.Error(t, err, "Expected source file to be deleted")
+	assert.True(t, os.IsNotExist(err), "Expected source file to be deleted")
 }

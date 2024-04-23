@@ -23,20 +23,26 @@ ENV SBOM_UTILITIES_MODULE_HOME="/opt/sbom-utilities" \
 ARG BOMBER_URL="https://github.com/devops-kung-fu/bomber/releases/download/v${BOMBER_VERSION}/bomber_${BOMBER_VERSION}_linux_${ARCH}.tar.gz" \
     BOMBER_FILENAME="bomber_${BOMBER_VERSION}_linux_${ARCH}.tar.gz" \
     SBOMQS_URL="https://github.com/interlynk-io/sbomqs/releases/download/${SBOMQS_VERSION}/sbomqs-linux-${ARCH}" \
-    SBOMQS_FILENAME="sbomqs-linux-${ARCH}"
+    SBOMQS_FILENAME="sbomqs-linux-${ARCH}" \
+    GRYPE_URL="https://raw.githubusercontent.com/anchore/grype/main/install.sh"
 
-RUN apk --no-cache add bash=${BASH_VERSION} \
-    && wget ${BOMBER_URL} --quiet \
+RUN apk --no-cache add bash="${BASH_VERSION}" \
+    && wget "${BOMBER_URL}" --quiet \
     && mkdir -p /opt/bomber \
-    && tar xf ${BOMBER_FILENAME} -C /opt/bomber \
-    && rm ${BOMBER_FILENAME} \
-    && wget ${SBOMQS_URL} --quiet \
+    && tar xf "${BOMBER_FILENAME}" -C /opt/bomber \
+    && rm "${BOMBER_FILENAME}" \
+    && wget "${SBOMQS_URL}" --quiet \
     && mkdir /opt/sbomqs \
-    && cp ${SBOMQS_FILENAME} /opt/sbomqs \
-    && chmod +x /opt/sbomqs/${SBOMQS_FILENAME} \
-    && ln -s /opt/sbomqs/${SBOMQS_FILENAME} /opt/sbomqs/sbomqs \
+    && cp "${SBOMQS_FILENAME}" /opt/sbomqs \
+    && chmod +x /opt/sbomqs/"${SBOMQS_FILENAME}" \
+    && ln -s /opt/sbomqs/"${SBOMQS_FILENAME}" /opt/sbomqs/sbomqs \
     && chmod +x /opt/sbomqs/sbomqs \
-    && go install github.com/google/osv-scanner/cmd/osv-scanner@${OSV_SCANNER_VERSION} \
+    && mkdir /opt/grype \
+    && wget -P /opt/grype "${GRYPE_URL}" --quiet \
+    && chmod +x /opt/grype/install.sh \
+    && /opt/grype/install.sh -b /opt/grype v0.75.0 \
+    && rm /opt/grype/install.sh \
+    && go install github.com/google/osv-scanner/cmd/osv-scanner@"${OSV_SCANNER_VERSION}" \
     && go clean -cache -testcache -modcache -fuzzcache
 
 COPY --from=builder /build/bin/sbom-utils ${SBOM_UTILITIES_MODULE_HOME}/bin/sbom-utils
@@ -51,6 +57,6 @@ USER bitbucket-user
 
 WORKDIR ${SBOM_UTILITIES_MODULE_HOME}
 
-ENV PATH="${SBOM_UTILITIES_MODULE_HOME}/bin:/opt/bomber:/opt/sbomqs:${PATH}"
+ENV PATH="${SBOM_UTILITIES_MODULE_HOME}/bin:/opt/bomber:/opt/sbomqs:/opt/grype:${PATH}"
 
 ENTRYPOINT ["sbom-utils"]

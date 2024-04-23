@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"sbom-utilities/bomber"
+	"sbom-utilities/grype"
 	"sbom-utilities/osv"
 	"sbom-utilities/sbomqs"
 	"sbom-utilities/utils"
@@ -66,6 +67,11 @@ func main() {
 	// osv-scanner
 	if utils.CheckIfEnvVarIsTrue("SCAN_SBOM_WITH_OSV") {
 		scanWithOsv(sbomFile, outputDir)
+	}
+
+	// grype
+	if utils.CheckIfEnvVarIsTrue("SCAN_SBOM_WITH_GRYPE") {
+		scanWithGrype(sbomFile, outputDir)
 	}
 }
 
@@ -142,6 +148,23 @@ func scanWithOsv(sbomFile string, outputDir string) (result bool) {
 	}
 
 	utils.MoveFile(currentDir, outputDir, "osv-scan")
+
+	return true
+}
+
+func scanWithGrype(sbomFile string, outputDir string) (result bool) {
+	LogInfo.Print("scanning sbom via grype")
+
+	grype.CheckGrypeVersion()
+
+	grypeArgs := grype.GenGrypeArgs()
+	grypeArgs, grypeOutputFile := grype.GenGrypeOutputFilename(grypeArgs)
+
+	LogInfo.Print("the following grype args will be used: " + grypeArgs)
+
+	grype.ScanWithGrypeScanner(sbomFile, grypeArgs, "", LogInfo)
+
+	utils.MoveFileToDestination(".", outputDir, grypeOutputFile, true)
 
 	return true
 }
