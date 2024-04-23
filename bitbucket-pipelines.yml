@@ -100,7 +100,7 @@ pipelines:
                 name: Scan SBOM
                 script:
                     - chmod 777 sbom_output
-                    - pipe: docker://ccideas/sbom-utilities-pipe:1.2.0
+                    - pipe: docker://ccideas/sbom-utilities-pipe:1.3.0
                       variables:
                           PATH_TO_SBOM: 'sbom_output/${BITBUCKET_REPO_SLUG}_cyclonedx-sbom.json'
                           SCAN_SBOM_WITH_BOMBER: 'true'
