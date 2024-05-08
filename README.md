@@ -112,7 +112,7 @@ pipelines:
 | SCAN_SBOM_WITH_SBOMQS     | Used to scan the sBOM in order to generate a quality quality score  | true, false                     | false         | false    |
 | SBOMQS_OUTPUT_FORMAT      | Used to specify the output format of the sbomqs scan                | detailed, json                  | detailed      | false    |
 | SCAN_SBOM_WITH_OSV        | Used to scan the sBOM for vulberabilities using osv scanner         | true, false                     | false         | false    |
-| OSV_OUTPUT_FORMAT         | Used to specify the output format of the osv scan                   | table, json, markdown, sarif    | json          | false    |
+| OSV_ARGS                  | cmd args to use when running osv-scanner                                  | see osv-scanner scan --help for full list  |               | false    |
 | OSV_OUTPUT_FILENAME       | Used to specify the filename to store the osv scan output           | <filename>                      | auto-generated| false    |
 | SCAN_SBOM_WITH_GRYPE      | Used to scan the sBOM for vulberabilities using the grype scanner   | true, false                     | false         | false    |
 | GRYPE_ARGS                | cmd args to use when running grype                                  | see grype --help for full list  |               | false    |

@@ -138,16 +138,13 @@ func scanWithOsv(sbomFile string, outputDir string) (result bool) {
 	osv.CheckOsvScannerVersion()
 
 	osvArgs := osv.GenOsvArgs()
+	osvArgs, osvOutputFile := osv.GenOsvOutputFilename(osvArgs)
+
 	LogInfo.Print("the following osv-scanner args will be used: " + osvArgs)
 
-	osv.ScanWithOsvScanner(sbomFile, osvArgs, "", LogInfo)
+	osv.ScanWithOsvScanner(sbomFile, osvArgs, LogInfo)
 
-	currentDir, err := utils.RunBashCommand("pwd")
-	if err != nil {
-		LogError.Print("cant get current directory")
-	}
-
-	utils.MoveFile(currentDir, outputDir, "osv-scan")
+	utils.MoveFileToDestination(".", outputDir, osvOutputFile, true)
 
 	return true
 }

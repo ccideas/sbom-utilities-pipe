@@ -218,7 +218,6 @@ func OpenFile(file string) (srcFile *os.File, ioresult bool) {
 		return nil, false
 	}
 
-	//defer srcFile.Close()
 	return srcFile, true
 }
 

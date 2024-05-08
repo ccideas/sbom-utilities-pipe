@@ -6,6 +6,7 @@ profile.out
 coverage.out
 tmp.out
 **/temp*
+osv-scan_*
 
 # build output
 sbom-utils
