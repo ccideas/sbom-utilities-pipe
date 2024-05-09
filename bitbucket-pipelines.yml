@@ -1,3 +1,6 @@
+clone:
+  depth: full
+
 definitions:
   steps:
     - step: &build-docker-image
@@ -55,6 +58,11 @@ definitions:
             - syft "${BITBUCKET_REPO_SLUG}:local" --output cyclonedx-json@1.4 >> sbom_output/${BITBUCKET_REPO_SLUG}_cyclonedx-sbom.json
           artifacts:
             - sbom_output/*
+    - step: &sonarcloud
+          name: sonarcloud scan
+          script:
+            - pipe: sonarsource/sonarcloud-scan:2.0.0
+            - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
 
 pipelines:
   pull-requests:
@@ -65,6 +73,7 @@ pipelines:
         - step: *build-test
         - step: *go-formatter
         - step: *go-lint-yourself
+        - step: *sonarcloud
       - step: *gen-sbom-for-project
   branches:
     main:
@@ -74,6 +83,7 @@ pipelines:
         - step: *build-test
         - step: *go-formatter
         - step: *go-lint-yourself
+        - step: *sonarcloud
       - step: *gen-sbom-for-project
   custom:
     push to Dockerhub (dev):
