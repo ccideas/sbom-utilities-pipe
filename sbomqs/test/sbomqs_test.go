@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 	"time"
-
 	"github.com/stretchr/testify/assert"
+	"sbom-utilities/sbomqs"
 )
 
 func MockGetBitbucketRepoSlug() string {
@@ -27,7 +27,7 @@ func TestGenSbomqsArgsWithJsonOutputFormat(t *testing.T) {
 	defer func() { os.Setenv("SBOMQS_OUTPUT_FORMAT", oldEnv) }()
 	os.Setenv("SBOMQS_OUTPUT_FORMAT", "json")
 
-	args := GenSbomqsArgs()
+	args := sbomqs.GenSbomqsArgs()
 
 	expectedArgs := "score --json "
 	assert.Equal(t, expectedArgs, args)
@@ -39,7 +39,7 @@ func TestGenSbomqsArgsWithDetailedOutputFormat(t *testing.T) {
 	defer func() { os.Setenv("SBOMQS_OUTPUT_FORMAT", oldEnv) }()
 	os.Setenv("SBOMQS_OUTPUT_FORMAT", "detailed")
 
-	args := GenSbomqsArgs()
+	args := sbomqs.GenSbomqsArgs()
 
 	expectedArgs := "score --detailed "
 	assert.Equal(t, expectedArgs, args)
@@ -51,7 +51,7 @@ func TestGenSbomqsArgsWithNoOutputFormatSet(t *testing.T) {
 	defer func() { os.Setenv("SBOMQS_OUTPUT_FORMAT", oldEnv) }()
 	os.Unsetenv("SBOMQS_OUTPUT_FORMAT")
 
-	args := GenSbomqsArgs()
+	args := sbomqs.GenSbomqsArgs()
 
 	expectedArgs := "score"
 	assert.Equal(t, expectedArgs, args)

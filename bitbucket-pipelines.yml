@@ -2,6 +2,8 @@ clone:
   depth: full
 
 definitions:
+  caches:
+    sonar: ~/.sonar/cache
   steps:
     - step: &build-docker-image
         name: 'Build Docker Image'
@@ -24,12 +26,11 @@ definitions:
         image: golang:1.21.1-alpine3.18
         name: 'Build & Test'
         script:
-          - go build -o bin/sbom-utils
-          - apk add bash
-          - go test -v -covermode=count -coverprofile=profile.out sbom-utilities/utils
+          - apk add --no-cache make bash
+          - make clean build test
         artifacts:
           - "bin/*"
-          - "profile.out"
+          - "**/profile.out"
     - step: &go-formatter
         image: golang:1.21.1-alpine3.18
         name: 'Check Go Formatting'
@@ -60,9 +61,11 @@ definitions:
             - sbom_output/*
     - step: &sonarcloud
           name: sonarcloud scan
+          image: sonarsource/sonar-scanner-cli:5
+          caches:
+            - sonar
           script:
-            - pipe: sonarsource/sonarcloud-scan:2.0.0
-            - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
+            - sonar-scanner
 
 pipelines:
   pull-requests:
@@ -73,8 +76,9 @@ pipelines:
         - step: *build-test
         - step: *go-formatter
         - step: *go-lint-yourself
+      - parallel:
         - step: *sonarcloud
-      - step: *gen-sbom-for-project
+        - step: *gen-sbom-for-project
   branches:
     main:
       - parallel:
@@ -83,8 +87,9 @@ pipelines:
         - step: *build-test
         - step: *go-formatter
         - step: *go-lint-yourself
+      - parallel:
         - step: *sonarcloud
-      - step: *gen-sbom-for-project
+        - step: *gen-sbom-for-project
   custom:
     push to Dockerhub (dev):
       - step: *build-docker-image

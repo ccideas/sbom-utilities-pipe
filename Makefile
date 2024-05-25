@@ -5,12 +5,21 @@ PACKAGES ?= $(shell $(GO) list ./...)
 VETPACKAGES ?= $(shell $(GO) list ./... | grep -v /examples/)
 GOFILES := $(shell find . -name "*.go")
 TESTFOLDER := $(shell $(GO) list ./... | grep -E 'utils$$')
-TESTTAGS ?= "-v"
+TESTTAGS ?=
 DOCKER ?= docker
+TEST_FILES := $(shell find . -name '*_test.go')
 
 .PHONY: test
+
 test:
-	$(GO) test $(TESTTAGS) -covermode=count -coverprofile=profile.out sbom-utilities/utils sbom-utilities/sbomqs
+	@echo "Starting test process..."
+	@find . -type d -name 'test' | while read -r dir; do \
+	    echo "Running tests in $$dir"; \
+	    $(GO) test $(TESTTAGS) -covermode=set -coverprofile="$$dir/profile.out" "$$dir"; \
+	done
+
+# For better visibility on the command that's being executed.
+	@echo "Finished test process."
 
 .PHONY: fmt
 fmt:
@@ -31,7 +40,7 @@ lint:
 
 .PHONY: clean
 clean:
-	$(shell rm profile.out)
+	@find . -name 'profile.out' -exec rm -f {} +
 	$(shell rm -rf bin)
 	$(shell rm tmp.out)
 	$(shell rm -rf utils/*temp*)
