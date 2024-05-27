@@ -4,7 +4,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
-	"sbom-utilities/utils"
 )
 
 func TestRunBashCommand(t *testing.T) {
@@ -12,7 +11,7 @@ func TestRunBashCommand(t *testing.T) {
 	command := "echo 'Hello, World!'"
 
 	//when
-	output, err := utils.RunBashCommand(command)
+	output, err := RunBashCommand(command)
 
 	//then
 	assert.NoError(t, err, "expected no error but got one")
@@ -25,7 +24,7 @@ func TestRunBashCommandFailureCase(t *testing.T) {
 	command := "'Hello, World!'"
 
 	//when
-	output, err := utils.RunBashCommand(command)
+	output, err := RunBashCommand(command)
 
 	//then
 	assert.Error(t, err, "expexted an error but did not get one")
@@ -38,7 +37,7 @@ func TestCheckEnvVarThatExists(t *testing.T) {
 	os.Setenv("TEST_ENV_VAR", "1")
 
 	//when
-	_, result := utils.CheckEnvVar("TEST_ENV_VAR")
+	_, result := CheckEnvVar("TEST_ENV_VAR")
 
 	//then
 	assert.True(t, result)
@@ -46,7 +45,7 @@ func TestCheckEnvVarThatExists(t *testing.T) {
 
 func TestCheckEnvVarThatDoesNotExists(t *testing.T) {
 	//when
-	_, result := utils.CheckEnvVar("THIS_ENV_VAR_DOES_NOT_EXIST")
+	_, result := CheckEnvVar("THIS_ENV_VAR_DOES_NOT_EXIST")
 
 	//then
 	assert.False(t, result)
@@ -57,7 +56,7 @@ func TestEnvVarIsTrue(t *testing.T) {
 	os.Setenv("DO_SOMETHING", "true")
 
 	//when & then
-	assert.True(t, utils.CheckIfEnvVarIsTrue("DO_SOMETHING"))
+	assert.True(t, CheckIfEnvVarIsTrue("DO_SOMETHING"))
 }
 
 func TestEnvVarIsNotTrue(t *testing.T) {
@@ -65,18 +64,18 @@ func TestEnvVarIsNotTrue(t *testing.T) {
 	os.Setenv("DO_SOMETHING", "false")
 
 	//when & then
-	assert.False(t, utils.CheckIfEnvVarIsTrue("DO_SOMETHING"))
+	assert.False(t, CheckIfEnvVarIsTrue("DO_SOMETHING"))
 }
 
 func TestCheckIfFileExists(t *testing.T) {
 	//given
 	tempDirName := t.TempDir()
 
-	assert.True(t, utils.CheckFileExists(tempDirName), "directory does not exist")
+	assert.True(t, CheckFileExists(tempDirName), "directory does not exist")
 }
 
 func TestCheckIfFileDoesNotExists(t *testing.T) {
-	assert.False(t, utils.CheckFileExists("thisDirDoesNotExist"))
+	assert.False(t, CheckFileExists("thisDirDoesNotExist"))
 }
 
 func TestRunLiveBashCommand(t *testing.T) {
@@ -84,7 +83,7 @@ func TestRunLiveBashCommand(t *testing.T) {
 	command := "echo 'Hello, World!'"
 
 	//when
-	err := utils.RunLiveBashCommand(command, "")
+	err := RunLiveBashCommand(command, "")
 
 	//then
 	assert.NoError(t, err, "expected no error but got one")
@@ -95,7 +94,7 @@ func TestRunLiveBashCommandFailure(t *testing.T) {
 	command := "'Hello, World!'"
 
 	//when
-	err := utils.RunLiveBashCommand(command, "")
+	err := RunLiveBashCommand(command, "")
 
 	//then
 	assert.Error(t, err, "expexted an error but did not get one")
@@ -106,11 +105,11 @@ func TestVerifyOrCreateDirectory(t *testing.T) {
 	testDir := t.TempDir()
 
 	// Test case 1: VerifyOrCreateDirectory for a non-existent directory
-	result := utils.VerifyOrCreateDirectory(testDir)
+	result := VerifyOrCreateDirectory(testDir)
 	assert.True(t, result, "expected directory to be created, but it wasn't")
 
 	// Test case 2: VerifyOrCreateDirectory for an existing directory
-	result = utils.VerifyOrCreateDirectory(testDir)
+	result = VerifyOrCreateDirectory(testDir)
 	assert.True(t, result, "expected directory to exist, but it didn't")
 }
 
@@ -118,7 +117,7 @@ func TestSetEnvVariable(t *testing.T) {
 	// set env variable - string
 	envName := "THIS_IS_MY_ENV_VARIABLE"
 	envValue := "THIS_IS_MY_ENV_VARIABLE_VALUE"
-	result := utils.SetEnvVariable(envName, envValue)
+	result := SetEnvVariable(envName, envValue)
 
 	assert.Empty(t, result, "expected result to be empty")
 	assert.Equal(t, os.Getenv(envName), envValue, "expected env variables to match")
@@ -127,7 +126,7 @@ func TestSetEnvVariable(t *testing.T) {
 func TestCreateDir(t *testing.T) {
 	dir := t.TempDir()
 
-	assert.True(t, utils.CreateDir(dir), "Expected directory creation to succeed")
+	assert.True(t, CreateDir(dir), "Expected directory creation to succeed")
 
 	_, err := os.Stat(dir)
 
@@ -138,7 +137,7 @@ func TestCreateDirFailure(t *testing.T) {
 	t.Skip("Skipping test since it fails on bitbucket due to always running as the root user")
 	invalidDir := "/invalidDir"
 
-	assert.False(t, utils.CreateDir(invalidDir), "Expected directory creation to fail")
+	assert.False(t, CreateDir(invalidDir), "Expected directory creation to fail")
 }
 
 func TestOpenFile(t *testing.T) {
@@ -147,7 +146,7 @@ func TestOpenFile(t *testing.T) {
 	_, _ = file.WriteString("Temporary file for testing")
 	path := file.Name()
 
-	srcFile, ioResult := utils.OpenFile(path)
+	srcFile, ioResult := OpenFile(path)
 	assert.NotNil(t, srcFile, "Expected file to be opened successfully")
 	assert.True(t, ioResult, "Expected ioresult to be true")
 
@@ -158,7 +157,7 @@ func TestOpenFileFailure(t *testing.T) {
 
 	invalidFilePath := "nonexistent_file.txt"
 
-	srcFile, ioResult := utils.OpenFile(invalidFilePath)
+	srcFile, ioResult := OpenFile(invalidFilePath)
 	assert.Nil(t, srcFile, "Expected file to be nil")
 	assert.False(t, ioResult, "Expected ioresult to be false")
 }
@@ -169,7 +168,7 @@ func TestCreateFile(t *testing.T) {
 	_, _ = file.WriteString("Temporary file for testing")
 	path := file.Name()
 
-	destFile, result := utils.CreateFile(path)
+	destFile, result := CreateFile(path)
 	assert.NotNil(t, destFile, "Expected file to be created successfully")
 	assert.True(t, result, "Expected result to be true")
 
@@ -182,7 +181,7 @@ func TestCreateFile(t *testing.T) {
 func TestCreateFileFailure(t *testing.T) {
 
 	invalidFilePath := "/invalid_path/test_file.txt"
-	destFile, result := utils.CreateFile(invalidFilePath)
+	destFile, result := CreateFile(invalidFilePath)
 	assert.Nil(t, destFile, "Expected file to be nil")
 	assert.False(t, result, "Expected result to be false")
 
@@ -203,7 +202,7 @@ func TestCopyFileNoDelete(t *testing.T) {
 	_, err = srcFile.WriteString("Temporary content for testing")
 	assert.NoError(t, err, "Error writing to source file")
 
-	result := utils.CopyFile(destFile, srcFile, false)
+	result := CopyFile(destFile, srcFile, false)
 	assert.True(t, result, "Expected file copying to succeed")
 
 	destFileInfo, err := destFile.Stat()
@@ -223,7 +222,7 @@ func TestCopyFileDelete(t *testing.T) {
 	defer destFile.Close()
 	defer os.Remove(destFile.Name())
 
-	result := utils.CopyFile(destFile, srcFile, true)
+	result := CopyFile(destFile, srcFile, true)
 	assert.True(t, result, "Expected file copying with source deletion to succeed")
 
 	// Check if the source file is deleted

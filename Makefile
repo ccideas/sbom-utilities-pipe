@@ -5,20 +5,20 @@ PACKAGES ?= $(shell $(GO) list ./...)
 VETPACKAGES ?= $(shell $(GO) list ./... | grep -v /examples/)
 GOFILES := $(shell find . -name "*.go")
 TESTFOLDER := $(shell $(GO) list ./... | grep -E 'utils$$')
-TESTTAGS ?=
 DOCKER ?= docker
 TEST_FILES := $(shell find . -name '*_test.go')
 
 .PHONY: test
-
 test:
 	@echo "Starting test process..."
-	@find . -type d -name 'test' | while read -r dir; do \
-	    echo "Running tests in $$dir"; \
-	    $(GO) test $(TESTTAGS) -covermode=set -coverprofile="$$dir/profile.out" "$$dir"; \
+	@mkdir -p coverage # Ensure the coverage directory exists
+	@packages=$$(go list ./...); \
+	for pkg in $${packages}; do \
+	    echo "Running tests in $${pkg}"; \
+	    $(GO) test -v $(TESTTAGS) -covermode=count -coverprofile="coverage/$${pkg##*/}.out" "$${pkg}"; \
 	done
-
-# For better visibility on the command that's being executed.
+	@echo "Combining coverage profiles..."
+	gocovmerge coverage/*.out > coverage/merged.out
 	@echo "Finished test process."
 
 .PHONY: fmt
@@ -52,6 +52,7 @@ clean:
 	$(shell rm package.json)
 	$(shell rm package-lock.json)
 	$(shell rm -rf node_modules)
+	$(shell rm -rf coverage)
 
 .PHONY: build
 build:

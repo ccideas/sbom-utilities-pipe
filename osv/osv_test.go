@@ -5,7 +5,6 @@ import (
 	"os"
 	"sbom-utilities/utils"
 	"testing"
-	"sbom-utilities/osv"
 )
 
 func TestGenOSVArgsWithDefaultArgs(t *testing.T) {
@@ -14,7 +13,7 @@ func TestGenOSVArgsWithDefaultArgs(t *testing.T) {
 	defer func() { os.Setenv("OSV_OUTPUT_FORMAT", oldEnv) }()
 	os.Setenv("OSV_OUTPUT_FORMAT", "json")
 
-	args := osv.GenOsvArgs()
+	args := GenOsvArgs()
 
 	expectedArgs := "scan --format table"
 	assert.Contains(t, args, expectedArgs)
@@ -25,7 +24,7 @@ func TestGenOsvOutputFilename_WithCmdArgs(t *testing.T) {
 	expectedOsvOutputFile := "filename.txt"
 	expectedResult := orgOsvArgs
 
-	osvArgs, osvOutputFile := osv.GenOsvOutputFilename(orgOsvArgs)
+	osvArgs, osvOutputFile := GenOsvOutputFilename(orgOsvArgs)
 
 	assert.Equal(t, expectedResult, osvArgs, "Generated osvArgs does not match expected result")
 	assert.Equal(t, expectedOsvOutputFile, osvOutputFile, "Generated osvOutputFile does not match expected result")
@@ -39,7 +38,7 @@ func TestGenOsvOutputFilename_WithEnvVariable(t *testing.T) {
 	_ = utils.SetEnvVariable("OSV_OUTPUT_FILENAME", expectedOsvOutputFile)
 	defer os.Unsetenv("OSV_OUTPUT_FILENAME")
 
-	osvArgs, osvOutputFile := osv.GenOsvOutputFilename(orgOsvArgs)
+	osvArgs, osvOutputFile := GenOsvOutputFilename(orgOsvArgs)
 
 	assert.Equal(t, expectedOsvArgs, osvArgs, "Generated osvArgs does not match expected result")
 	assert.Equal(t, expectedOsvOutputFile, osvOutputFile, "Generated osvOutputFile does not match expected result")
@@ -50,7 +49,7 @@ func TestGenOsvOutputFilename_WithoutCmdArgsOrEnvVariable(t *testing.T) {
 	orgOsvArgs := "osv --some other args"
 	expectedOsvOutputFilePattern := `osv-scan_[\w-]+_\d{8}-\d{2}-\d{2}-\d{2}\.txt`
 
-	osvArgs, osvOutputFile := osv.GenOsvOutputFilename(orgOsvArgs)
+	osvArgs, osvOutputFile := GenOsvOutputFilename(orgOsvArgs)
 
 	assert.Equal(t, orgOsvArgs+" --output "+osvOutputFile, osvArgs, "Generated osvArgs does not match expected result")
 	assert.Regexp(t, expectedOsvOutputFilePattern, osvOutputFile, "Generated osvOutputFile does not match expected pattern")

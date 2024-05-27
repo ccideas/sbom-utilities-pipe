@@ -1,0 +1,14 @@
+mode: count
+sbom-utilities/osv/osv.go:19.31,22.16 2 0
+sbom-utilities/osv/osv.go:22.16,24.3 1 0
+sbom-utilities/osv/osv.go:26.2,26.38 1 0
+sbom-utilities/osv/osv.go:29.26,32.13 2 1
+sbom-utilities/osv/osv.go:32.13,35.3 2 1
+sbom-utilities/osv/osv.go:37.2,37.16 1 1
+sbom-utilities/osv/osv.go:40.89,47.2 4 0
+sbom-utilities/osv/osv.go:49.85,54.52 2 3
+sbom-utilities/osv/osv.go:54.52,57.24 2 1
+sbom-utilities/osv/osv.go:57.24,62.4 3 1
+sbom-utilities/osv/osv.go:66.2,66.77 1 2
+sbom-utilities/osv/osv.go:66.77,72.3 3 1
+sbom-utilities/osv/osv.go:75.2,80.31 5 1
