@@ -68,11 +68,11 @@ docker-amd64:
 
 .PHONY: docker-run
 docker-run:
-	$(DOCKER) run --rm -it --workdir /tmp -v $(PWD)/examples:/tmp/examples --env-file variables.list sbom-utilities-pipe:dev
+	$(DOCKER) run --rm -it --workdir /tmp -v $(PWD)/examples:/tmp/examples -v $(PWD)/build:/tmp/build --env-file variables.list sbom-utilities-pipe:dev
 
 .PHONY: docker-debug
 docker-debug:
-	$(DOCKER) run --rm -it --workdir /tmp -v $(PWD)/examples:/tmp/examples --env-file variables.list --entrypoint bash sbom-utilities-pipe:dev
+	$(DOCKER) run --rm -it --workdir /tmp -v $(PWD)/examples:/tmp/examples -v $(PWD)/build:/tmp/build --env-file variables.list --entrypoint bash sbom-utilities-pipe:dev
 
 .PHONY: docker-lint
 docker-lint:

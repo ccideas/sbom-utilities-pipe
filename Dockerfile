@@ -1,6 +1,6 @@
 # build stage
 
-FROM golang:1.21.8-alpine3.18 AS builder
+FROM golang:1.22.6-alpine3.20 AS builder
 
 # copy source and build
 COPY . /build
@@ -10,15 +10,16 @@ RUN go build -o bin/sbom-utils
 
 # runtime stage
 
-FROM golang:1.21.8-alpine3.18
+FROM golang:1.22.6-alpine3.20
 
 ARG ARCH
 
 ENV SBOM_UTILITIES_MODULE_HOME="/opt/sbom-utilities" \
-    BASH_VERSION="5.2.15-r5" \
+    BASH_VERSION="5.2.26-r0" \
     BOMBER_VERSION="0.4.8" \
-    OSV_SCANNER_VERSION="v1.7.0" \
-    SBOMQS_VERSION="v0.0.30"
+    OSV_SCANNER_VERSION="v1.8.3" \
+    SBOMQS_VERSION="v0.1.7" \
+    GRYPE_VERSION="v0.79.4"
     
 ARG BOMBER_URL="https://github.com/devops-kung-fu/bomber/releases/download/v${BOMBER_VERSION}/bomber_${BOMBER_VERSION}_linux_${ARCH}.tar.gz" \
     BOMBER_FILENAME="bomber_${BOMBER_VERSION}_linux_${ARCH}.tar.gz" \
@@ -26,7 +27,8 @@ ARG BOMBER_URL="https://github.com/devops-kung-fu/bomber/releases/download/v${BO
     SBOMQS_FILENAME="sbomqs-linux-${ARCH}" \
     GRYPE_URL="https://raw.githubusercontent.com/anchore/grype/main/install.sh"
 
-RUN apk --no-cache add bash="${BASH_VERSION}" \
+RUN apk update upgrade \
+    && apk --no-cache add bash="${BASH_VERSION}" \
     && wget "${BOMBER_URL}" --quiet \
     && mkdir -p /opt/bomber \
     && tar xf "${BOMBER_FILENAME}" -C /opt/bomber \
@@ -40,7 +42,7 @@ RUN apk --no-cache add bash="${BASH_VERSION}" \
     && mkdir /opt/grype \
     && wget -P /opt/grype "${GRYPE_URL}" --quiet \
     && chmod +x /opt/grype/install.sh \
-    && /opt/grype/install.sh -b /opt/grype v0.75.0 \
+    && /opt/grype/install.sh -b /opt/grype "${GRYPE_VERSION}" \
     && rm /opt/grype/install.sh \
     && go install github.com/google/osv-scanner/cmd/osv-scanner@"${OSV_SCANNER_VERSION}" \
     && go clean -cache -testcache -modcache -fuzzcache

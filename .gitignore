@@ -7,6 +7,7 @@ coverage.out
 tmp.out
 **/temp*
 osv-scan_*
+coverage/
 
 # build output
 sbom-utils
