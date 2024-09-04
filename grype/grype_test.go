@@ -39,6 +39,6 @@ func TestGenGrypeOutputFilename_WithoutCmdArgsOrEnvVariable(t *testing.T) {
 
 	grypeArgs, grypeOutputFile := GenGrypeOutputFilename(orgGrypeArgs)
 
-	assert.Equal(t, orgGrypeArgs + " --file " + grypeOutputFile, grypeArgs, "Generated grypeArgs does not match expected result")
+	assert.Equal(t, orgGrypeArgs+" --file "+grypeOutputFile, grypeArgs, "Generated grypeArgs does not match expected result")
 	assert.Regexp(t, expectedGrypeOutputFilePattern, grypeOutputFile, "Generated grypeOutputFile does not match expected pattern")
 }

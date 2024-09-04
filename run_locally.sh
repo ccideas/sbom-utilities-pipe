@@ -14,5 +14,9 @@ export SCAN_SBOM_WITH_OSV=true
 export SCAN_SBOM_WITH_GRYPE=true
 export GRYPE_ARGS="--output table --file my-wonderful-grype-output.txt --add-cpes-if-none"
 #export GRYPE_OUTPUT_FILENAME="my-grype-output.json"
+export SEND_SBOM_TO_DTRACK=true
+export DTRACK_URL=http://localhost:8081
+export DTRACK_PROJECT_ID=SOMEPROJECTID
+export DTRACK_API_KEY=SOMEAPIKEY
 
 ./bin/sbom-utils

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"sbom-utilities/bomber"
+	"sbom-utilities/dtrack"
 	"sbom-utilities/grype"
 	"sbom-utilities/osv"
 	"sbom-utilities/sbomqs"
@@ -72,6 +73,11 @@ func main() {
 	// grype
 	if utils.CheckIfEnvVarIsTrue("SCAN_SBOM_WITH_GRYPE") {
 		scanWithGrype(sbomFile, outputDir)
+	}
+
+	// send downstream to dtrack
+	if utils.CheckIfEnvVarIsTrue("SEND_SBOM_TO_DTRACK") {
+		sendToDtrack(sbomFile)
 	}
 }
 
@@ -164,4 +170,10 @@ func scanWithGrype(sbomFile string, outputDir string) (result bool) {
 	utils.MoveFileToDestination(".", outputDir, grypeOutputFile, true)
 
 	return true
+}
+
+func sendToDtrack(sbomFile string) {
+	LogInfo.Print("sending sbom downstream to Dependency Track")
+
+	dtrack.SendToDtrack(sbomFile)
 }
