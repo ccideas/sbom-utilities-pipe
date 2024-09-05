@@ -150,7 +150,7 @@ Then configure your bitbucket-pipelines.yml with the following
         # the build directory is owned by root but the pipe runs as the bitbucket-user
         # change the permission to allow the pipe to write to the build directory
         - chmod 777 build
-        - pipe: docker://ccideas/sbom-utilities-pipe:1.4.0
+        - pipe: docker://ccideas/sbom-utilities-pipe:1.5.0
           variables:
             SEND_SBOM_TO_DTRACK: 'true'
             DTRACK_URL: ${DTRACK_URL}
