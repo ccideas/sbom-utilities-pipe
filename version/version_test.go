@@ -6,7 +6,7 @@ import (
 
 // TestGetModuleVersion verifies that GetModuleVersion returns the correct version.
 func TestGetModuleVersion(t *testing.T) {
-	expectedVersion := "v1.4.0"
+	expectedVersion := "v1.5.0"
 	actualVersion := GetModuleVersion()
 
 	if actualVersion != expectedVersion {
