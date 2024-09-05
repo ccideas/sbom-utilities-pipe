@@ -3,8 +3,13 @@ package osv
 import (
 	"log"
 	"os"
+	"regexp"
 	"sbom-utilities/utils"
+	"strings"
 )
+
+const OSV_DEFAULT_CMD_PARAMS = "scan --format table"
+const OSV_ARG_FILENAME = "--output"
 
 // configure logger
 var (
@@ -22,53 +27,55 @@ func CheckOsvScannerVersion() {
 }
 
 func GenOsvArgs() string {
-	var osvArgs string
+	osvArgs, result := utils.CheckEnvVar("OSV_ARGS")
 
-	osvArgs += "scan"
-
-	var osvOutputFormat string
-	if tmp, isSet := utils.CheckEnvVar("OSV_OUTPUT_FORMAT"); isSet {
-		osvArgs += " --format " + tmp + " "
-		if tmp == "json" || tmp == "sarif" {
-			osvOutputFormat = "json"
-		} else if tmp == "markdown" {
-			osvOutputFormat = "md"
-		} else if tmp == "table" {
-			osvOutputFormat = "txt"
-		}
-	}
-
-	osvArgs += " --output " + GenOutputFilename(osvOutputFormat)
-
-	if osvVerbosity, isSet := utils.CheckEnvVar("OSV_VERBOSITY"); isSet {
-		osvArgs += " --verbosity " + osvVerbosity + " "
-	}
-
-	if osvCallAnalysis, isSet := utils.CheckEnvVar("OSV_CALL_ANALYSIS"); isSet {
-		osvArgs += " --call-analysis " + osvCallAnalysis + " "
-	}
-
-	if osvConfigFile, isSet := utils.CheckEnvVar("OSV_CONFIG_FILE"); isSet {
-		osvArgs += " --config " + osvConfigFile + " "
+	if !result {
+		Log.Print("Info: no osv args set, using defaults")
+		osvArgs = OSV_DEFAULT_CMD_PARAMS
 	}
 
 	return osvArgs
 }
 
-func GenOutputFilename(format string) string {
-
-	if osvOutputFile, isSet := utils.CheckEnvVar("OSV_OUTPUT_FILENAME"); isSet {
-		return osvOutputFile
-	} else {
-		return utils.GenerateFilename("osv-scan", format)
-	}
-}
-
-func ScanWithOsvScanner(sbom string, switches string, outputFilename string, logger *log.Logger) (result bool) {
+func ScanWithOsvScanner(sbom string, switches string, logger *log.Logger) (result bool) {
 	cmd := "osv-scanner " + switches + " " + " --sbom " + sbom
 	logger.Print("running the following command: " + cmd)
 
 	err := utils.RunLiveBashCommand(cmd, "")
 
 	return err == nil
+}
+
+func GenOsvOutputFilename(orgOsvArgs string) (osvArgs string, osvOutputFile string) {
+
+	re := regexp.MustCompile(`--output\s+([^\s]+)`)
+
+	// if its passed in with the cmd args
+	if strings.Contains(orgOsvArgs, OSV_ARG_FILENAME) {
+		filename := re.FindStringSubmatch(orgOsvArgs)
+
+		if len(filename) > 1 {
+			outputFile := filename[1]
+			Log.Print("filename is set via cmd switch: ", outputFile)
+
+			return orgOsvArgs, outputFile
+		}
+	}
+
+	// if its set as a env variable
+	if osvOutputFile, isSet := utils.CheckEnvVar("OSV_OUTPUT_FILENAME"); isSet {
+
+		Log.Print("filename is set via env variable: ", osvOutputFile)
+		osvArgs = orgOsvArgs + " " + OSV_ARG_FILENAME + " " + osvOutputFile
+
+		return osvArgs, osvOutputFile
+	}
+
+	// if neither are ture - gen the filename
+	osvOutputFile = utils.GenerateFilename("osv-scan", "txt")
+	Log.Print("WARNING: --output switch and OSV_OUTPUT_FILENAME environment variables were not used, automatically settings filename")
+	Log.Print("Setting file extension to .txt.")
+	osvArgs = orgOsvArgs + " " + OSV_ARG_FILENAME + " " + osvOutputFile
+
+	return osvArgs, osvOutputFile
 }

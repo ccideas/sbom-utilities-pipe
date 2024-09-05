@@ -5,12 +5,21 @@ PACKAGES ?= $(shell $(GO) list ./...)
 VETPACKAGES ?= $(shell $(GO) list ./... | grep -v /examples/)
 GOFILES := $(shell find . -name "*.go")
 TESTFOLDER := $(shell $(GO) list ./... | grep -E 'utils$$')
-TESTTAGS ?= "-v"
 DOCKER ?= docker
+TEST_FILES := $(shell find . -name '*_test.go')
 
 .PHONY: test
 test:
-	$(GO) test $(TESTTAGS) -covermode=count -coverprofile=profile.out sbom-utilities/utils sbom-utilities/sbomqs
+	@echo "Starting test process..."
+	@mkdir -p coverage # Ensure the coverage directory exists
+	@packages=$$(go list ./...); \
+	for pkg in $${packages}; do \
+	    echo "Running tests in $${pkg}"; \
+	    $(GO) test -v $(TESTTAGS) -covermode=count -coverprofile="coverage/$${pkg##*/}.out" "$${pkg}"; \
+	done
+	@echo "Combining coverage profiles..."
+	gocovmerge coverage/*.out > coverage/merged.out
+	@echo "Finished test process."
 
 .PHONY: fmt
 fmt:
@@ -31,7 +40,7 @@ lint:
 
 .PHONY: clean
 clean:
-	$(shell rm profile.out)
+	@find . -name 'profile.out' -exec rm -f {} +
 	$(shell rm -rf bin)
 	$(shell rm tmp.out)
 	$(shell rm -rf utils/*temp*)
@@ -43,6 +52,7 @@ clean:
 	$(shell rm package.json)
 	$(shell rm package-lock.json)
 	$(shell rm -rf node_modules)
+	$(shell rm -rf coverage)
 
 .PHONY: build
 build:
@@ -58,11 +68,11 @@ docker-amd64:
 
 .PHONY: docker-run
 docker-run:
-	$(DOCKER) run --rm -it --workdir /tmp -v $(PWD)/examples:/tmp/examples --env-file variables.list sbom-utilities-pipe:dev
+	$(DOCKER) run --rm -it --workdir /tmp -v $(PWD)/examples:/tmp/examples -v $(PWD)/build:/tmp/build --env-file variables.list sbom-utilities-pipe:dev
 
 .PHONY: docker-debug
 docker-debug:
-	$(DOCKER) run --rm -it --workdir /tmp -v $(PWD)/examples:/tmp/examples --env-file variables.list --entrypoint bash sbom-utilities-pipe:dev
+	$(DOCKER) run --rm -it --workdir /tmp -v $(PWD)/examples:/tmp/examples -v $(PWD)/build:/tmp/build --env-file variables.list --entrypoint bash sbom-utilities-pipe:dev
 
 .PHONY: docker-lint
 docker-lint:

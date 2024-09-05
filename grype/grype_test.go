@@ -33,8 +33,9 @@ func TestGenGrypeOutputFilename_WithEnvVariable(t *testing.T) {
 }
 
 func TestGenGrypeOutputFilename_WithoutCmdArgsOrEnvVariable(t *testing.T) {
+	os.Setenv("BITBUCKET_REPO_SLUG", "some-bitbucket-slug")
 	orgGrypeArgs := "grype --some other args"
-	expectedGrypeOutputFilePattern := `grype-scan_\d{8}-\d{2}-\d{2}-\d{2}\.txt`
+	expectedGrypeOutputFilePattern := `grype-scan_[\w-]+_\d{8}-\d{2}-\d{2}-\d{2}\.txt`
 
 	grypeArgs, grypeOutputFile := GenGrypeOutputFilename(orgGrypeArgs)
 

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"sbom-utilities/bomber"
+	"sbom-utilities/dtrack"
 	"sbom-utilities/grype"
 	"sbom-utilities/osv"
 	"sbom-utilities/sbomqs"
@@ -73,6 +74,11 @@ func main() {
 	if utils.CheckIfEnvVarIsTrue("SCAN_SBOM_WITH_GRYPE") {
 		scanWithGrype(sbomFile, outputDir)
 	}
+
+	// send downstream to dtrack
+	if utils.CheckIfEnvVarIsTrue("SEND_SBOM_TO_DTRACK") {
+		sendToDtrack(sbomFile)
+	}
 }
 
 func scanWithBomber(sbomFile string, outputDir string) bool {
@@ -138,16 +144,13 @@ func scanWithOsv(sbomFile string, outputDir string) (result bool) {
 	osv.CheckOsvScannerVersion()
 
 	osvArgs := osv.GenOsvArgs()
+	osvArgs, osvOutputFile := osv.GenOsvOutputFilename(osvArgs)
+
 	LogInfo.Print("the following osv-scanner args will be used: " + osvArgs)
 
-	osv.ScanWithOsvScanner(sbomFile, osvArgs, "", LogInfo)
+	osv.ScanWithOsvScanner(sbomFile, osvArgs, LogInfo)
 
-	currentDir, err := utils.RunBashCommand("pwd")
-	if err != nil {
-		LogError.Print("cant get current directory")
-	}
-
-	utils.MoveFile(currentDir, outputDir, "osv-scan")
+	utils.MoveFileToDestination(".", outputDir, osvOutputFile, true)
 
 	return true
 }
@@ -167,4 +170,10 @@ func scanWithGrype(sbomFile string, outputDir string) (result bool) {
 	utils.MoveFileToDestination(".", outputDir, grypeOutputFile, true)
 
 	return true
+}
+
+func sendToDtrack(sbomFile string) {
+	LogInfo.Print("sending sbom downstream to Dependency Track")
+
+	dtrack.SendToDtrack(sbomFile)
 }

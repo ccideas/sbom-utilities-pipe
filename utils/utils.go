@@ -35,9 +35,7 @@ func RunBashCommand(command string) (string, error) {
 
 func CheckEnvVar(env string) (string, bool) {
 	value, result := os.LookupEnv(env)
-	if value == "" {
-		return "", result
-	}
+
 	return value, result
 }
 
@@ -218,7 +216,6 @@ func OpenFile(file string) (srcFile *os.File, ioresult bool) {
 		return nil, false
 	}
 
-	//defer srcFile.Close()
 	return srcFile, true
 }
 
